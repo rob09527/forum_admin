@@ -1,0 +1,18 @@
+# 构建产物
+**/dist/
+**/dist-ssr/
+
+# 依赖
+**/node_modules/
+
+# 环境与本地配置
+**/.env.local
+**/.env.*.local
+
+# 日志与临时文件
+*.log
+.DS_Store
+
+# 编辑器
+.idea/
+.vscode/
