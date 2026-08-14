@@ -19,8 +19,9 @@ RUN apk add --no-cache tzdata
 # 设置时区为中国东八区，这里的配置可以被docker-compose.yml或docker run时指定的时区覆盖
 ENV TZ="Asia/Shanghai"
 
-# 如果各公司有自己的私有源，可以替换registry地址,如使用官方源注释下一行
-RUN npm config set registry https://mirrors.huaweicloud.com/repository/npm/
+# 默认华为云源（本机国内构建快）；CI 用 --build-arg NPM_REGISTRY 覆盖为官方源
+ARG NPM_REGISTRY=https://mirrors.huaweicloud.com/repository/npm/
+RUN npm config set registry ${NPM_REGISTRY}
 # 锁 pnpm 11（allowBuilds 为 pnpm 11 语法，且与 lockfileVersion 9.0 一致）
 RUN npm install -g pnpm@11
 

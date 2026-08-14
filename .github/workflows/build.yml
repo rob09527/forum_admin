@@ -34,6 +34,8 @@ jobs:
           context: ${{ matrix.context }}
           push: true
           platforms: linux/amd64
+          build-args: |
+            NPM_REGISTRY=https://registry.npmjs.org/
           tags: |
             ghcr.io/rob09527/${{ matrix.image }}:latest
             ghcr.io/rob09527/${{ matrix.image }}:${{ github.ref_type == 'tag' && github.ref_name || github.sha }}
