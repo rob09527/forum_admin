@@ -1,11 +1,13 @@
 FROM node:lts-alpine
 WORKDIR /build
 # 设置npm镜像
-RUN npm config set registry https://registry.npmmirror.com
-COPY package.json /build/package.json
-RUN npm install
+RUN npm config set registry https://mirrors.huaweicloud.com/repository/npm/
+# 锁 pnpm 11（与 lockfile 一致）
+RUN npm install -g pnpm@11
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml /build/
+RUN pnpm install --frozen-lockfile
 COPY ./ /build
-RUN npm run build
+RUN pnpm run build
 
 FROM nginx
 RUN mkdir /app
