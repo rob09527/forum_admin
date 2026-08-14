@@ -502,6 +502,388 @@ declare namespace Eps {
 		[key: string]: any;
 	}
 
+	interface ForumAdvertEntity {
+		/**
+		 * 广告 ID
+		 */
+		id?: number;
+
+		/**
+		 * 广告标题（后台识别 + img alt），可空
+		 */
+		title?: string;
+
+		/**
+		 * banner 图片 URL（后台 cl-upload 返回的完整 URL）
+		 */
+		image?: string;
+
+		/**
+		 * 广告位置 sidebar/inline
+		 */
+		position?: string;
+
+		/**
+		 * 跳转链接（站内路径或外链），可空
+		 */
+		link?: string;
+
+		/**
+		 * 排序权重，越大越靠前
+		 */
+		sortOrder?: number;
+
+		/**
+		 * 是否上线
+		 */
+		isActive?: boolean;
+
+		/**
+		 * 创建时间
+		 */
+		createdAt?: timestamp;
+
+		/**
+		 * 最后更新时间
+		 */
+		updatedAt?: timestamp;
+
+		/**
+		 * 任意键值
+		 */
+		[key: string]: any;
+	}
+
+	interface ForumAnnouncementEntity {
+		/**
+		 * 公告 ID
+		 */
+		id?: number;
+
+		/**
+		 * 公告标题
+		 */
+		title?: string;
+
+		/**
+		 * 公告类型 normal/important/urgent/activity
+		 */
+		type?: string;
+
+		/**
+		 * 跳转链接（站内路径或外链），可空
+		 */
+		link?: string;
+
+		/**
+		 * 排序权重，越大越靠前
+		 */
+		sortOrder?: number;
+
+		/**
+		 * 是否上线
+		 */
+		isActive?: boolean;
+
+		/**
+		 * 创建时间
+		 */
+		createdAt?: timestamp;
+
+		/**
+		 * 最后更新时间
+		 */
+		updatedAt?: timestamp;
+
+		/**
+		 * 任意键值
+		 */
+		[key: string]: any;
+	}
+
+	interface ForumCategoryEntity {
+		/**
+		 * 分类 ID
+		 */
+		id?: number;
+
+		/**
+		 * 板块 slug，对应 posts.category 字段值
+		 */
+		slug?: string;
+
+		/**
+		 * 板块中文名
+		 */
+		name?: string;
+
+		/**
+		 * 板块 emoji 图标
+		 */
+		icon?: string;
+
+		/**
+		 * 排序权重，越小越靠前
+		 */
+		sortOrder?: number;
+
+		/**
+		 * 是否启用（禁用后从 /api/categories 隐藏、发帖不可选）
+		 */
+		isEnabled?: boolean;
+
+		/**
+		 * 创建时间
+		 */
+		createdAt?: timestamp;
+
+		/**
+		 * 最后更新时间
+		 */
+		updatedAt?: timestamp;
+
+		/**
+		 * 任意键值
+		 */
+		[key: string]: any;
+	}
+
+	interface ForumPointLogEntity {
+		/**
+		 * 流水 ID
+		 */
+		id?: number;
+
+		/**
+		 * 用户 ID
+		 */
+		userId?: number;
+
+		/**
+		 * 积分来源 checkin/post/comment/liked/transfer
+		 */
+		type?: string;
+
+		/**
+		 * 变动值，正数加分，transfer 管理调整可为负
+		 */
+		delta?: number;
+
+		/**
+		 * 变动后的鸡腿余额
+		 */
+		balanceAfter?: number;
+
+		/**
+		 * 关联的帖子/评论 ID，无关联为 null
+		 */
+		refId?: number;
+
+		/**
+		 * 操作者（管理调整 transfer 时是哪个管理员），非 transfer 为 null
+		 */
+		operator?: string;
+
+		/**
+		 * 变动时间
+		 */
+		createdAt?: timestamp;
+
+		/**
+		 * 用户名
+		 */
+		userName?: string;
+
+		/**
+		 * 任意键值
+		 */
+		[key: string]: any;
+	}
+
+	interface ForumPostEntity {
+		/**
+		 * 帖子 ID
+		 */
+		id?: number;
+
+		/**
+		 * 帖子标题
+		 */
+		title?: string;
+
+		/**
+		 * Markdown 正文
+		 */
+		content?: string;
+
+		/**
+		 * 板块 slug（DB 驱动，见 categories 表，勿在此处硬编码清单）
+		 */
+		category?: string;
+
+		/**
+		 * 标签列表
+		 */
+		tags?: string;
+
+		/**
+		 * 作者 ID
+		 */
+		authorId?: number;
+
+		/**
+		 * 浏览量
+		 */
+		viewCount?: number;
+
+		/**
+		 * 点赞数
+		 */
+		likeCount?: number;
+
+		/**
+		 * 评论数
+		 */
+		commentCount?: number;
+
+		/**
+		 * 是否置顶
+		 */
+		isPinned?: boolean;
+
+		/**
+		 * 发布时间
+		 */
+		createdAt?: timestamp;
+
+		/**
+		 * 最后更新时间
+		 */
+		updatedAt?: timestamp;
+
+		/**
+		 * 用户名
+		 */
+		authorName?: string;
+
+		/**
+		 * 任意键值
+		 */
+		[key: string]: any;
+	}
+
+	interface ForumUserEntity {
+		/**
+		 * 用户 ID
+		 */
+		id?: number;
+
+		/**
+		 * 用户名
+		 */
+		username?: string;
+
+		/**
+		 * 邮箱
+		 */
+		email?: string;
+
+		/**
+		 * 头像 URL
+		 */
+		avatar?: string;
+
+		/**
+		 * 个人简介
+		 */
+		bio?: string;
+
+		/**
+		 * 等级 claw/leg/meat
+		 */
+		level?: string;
+
+		/**
+		 * 鸡腿积分
+		 */
+		points?: number;
+
+		/**
+		 * 星辰
+		 */
+		stars?: number;
+
+		/**
+		 * 发帖数
+		 */
+		postCount?: number;
+
+		/**
+		 * 评论数
+		 */
+		commentCount?: number;
+
+		/**
+		 * 角色 user/mod/admin
+		 */
+		role?: string;
+
+		/**
+		 * 状态 active/banned/muted
+		 */
+		status?: string;
+
+		/**
+		 * 第三方登录来源
+		 */
+		oauthProvider?: string;
+
+		/**
+		 * 邮箱是否已验证
+		 */
+		emailVerified?: boolean;
+
+		/**
+		 * 累计上传字节数
+		 */
+		uploadSize?: number;
+
+		/**
+		 * 累计鸡腿（只增不减）
+		 */
+		totalPointsEarned?: number;
+
+		/**
+		 * 连续签到天数
+		 */
+		checkinStreak?: number;
+
+		/**
+		 * 累计签到天数
+		 */
+		checkinTotalDays?: number;
+
+		/**
+		 * 上次签到时间
+		 */
+		lastCheckinAt?: timestamp;
+
+		/**
+		 * 注册时间
+		 */
+		createdAt?: timestamp;
+
+		/**
+		 * 最后更新时间
+		 */
+		updatedAt?: timestamp;
+
+		/**
+		 * 任意键值
+		 */
+		[key: string]: any;
+	}
+
 	interface PluginInfoEntity {
 		/**
 		 * ID
@@ -1029,6 +1411,36 @@ declare namespace Eps {
 	interface DictTypePageResponse {
 		pagination: PagePagination;
 		list: DictTypeEntity[];
+	}
+
+	interface ForumAdvertPageResponse {
+		pagination: PagePagination;
+		list: ForumAdvertEntity[];
+	}
+
+	interface ForumAnnouncementPageResponse {
+		pagination: PagePagination;
+		list: ForumAnnouncementEntity[];
+	}
+
+	interface ForumCategoryPageResponse {
+		pagination: PagePagination;
+		list: ForumCategoryEntity[];
+	}
+
+	interface ForumPointLogPageResponse {
+		pagination: PagePagination;
+		list: ForumPointLogEntity[];
+	}
+
+	interface ForumPostPageResponse {
+		pagination: PagePagination;
+		list: ForumPostEntity[];
+	}
+
+	interface ForumUserPageResponse {
+		pagination: PagePagination;
+		list: ForumUserEntity[];
 	}
 
 	interface PluginInfoPageResponse {
@@ -1769,6 +2181,332 @@ declare namespace Eps {
 		request: Request;
 	}
 
+	interface ForumAdvert {
+		/**
+		 * 修改
+		 */
+		update(data?: any): Promise<any>;
+
+		/**
+		 * 删除
+		 */
+		delete(data?: any): Promise<any>;
+
+		/**
+		 * 分页查询
+		 */
+		page(data?: any): Promise<ForumAdvertPageResponse>;
+
+		/**
+		 * 列表查询
+		 */
+		list(data?: any): Promise<ForumAdvertEntity[]>;
+
+		/**
+		 * 单个信息
+		 */
+		info(data?: any): Promise<ForumAdvertEntity>;
+
+		/**
+		 * 新增
+		 */
+		add(data?: any): Promise<any>;
+
+		/**
+		 * 权限标识
+		 */
+		permission: {
+			update: string;
+			delete: string;
+			page: string;
+			list: string;
+			info: string;
+			add: string;
+		};
+
+		/**
+		 * 权限状态
+		 */
+		_permission: {
+			update: boolean;
+			delete: boolean;
+			page: boolean;
+			list: boolean;
+			info: boolean;
+			add: boolean;
+		};
+
+		request: Request;
+	}
+
+	interface ForumAnnouncement {
+		/**
+		 * 修改
+		 */
+		update(data?: any): Promise<any>;
+
+		/**
+		 * 删除
+		 */
+		delete(data?: any): Promise<any>;
+
+		/**
+		 * 分页查询
+		 */
+		page(data?: any): Promise<ForumAnnouncementPageResponse>;
+
+		/**
+		 * 列表查询
+		 */
+		list(data?: any): Promise<ForumAnnouncementEntity[]>;
+
+		/**
+		 * 单个信息
+		 */
+		info(data?: any): Promise<ForumAnnouncementEntity>;
+
+		/**
+		 * 新增
+		 */
+		add(data?: any): Promise<any>;
+
+		/**
+		 * 权限标识
+		 */
+		permission: {
+			update: string;
+			delete: string;
+			page: string;
+			list: string;
+			info: string;
+			add: string;
+		};
+
+		/**
+		 * 权限状态
+		 */
+		_permission: {
+			update: boolean;
+			delete: boolean;
+			page: boolean;
+			list: boolean;
+			info: boolean;
+			add: boolean;
+		};
+
+		request: Request;
+	}
+
+	interface ForumCategory {
+		/**
+		 * 修改
+		 */
+		update(data?: any): Promise<any>;
+
+		/**
+		 * 删除
+		 */
+		delete(data?: any): Promise<any>;
+
+		/**
+		 * 分页查询
+		 */
+		page(data?: any): Promise<ForumCategoryPageResponse>;
+
+		/**
+		 * 列表查询
+		 */
+		list(data?: any): Promise<ForumCategoryEntity[]>;
+
+		/**
+		 * 单个信息
+		 */
+		info(data?: any): Promise<ForumCategoryEntity>;
+
+		/**
+		 * 新增
+		 */
+		add(data?: any): Promise<any>;
+
+		/**
+		 * 权限标识
+		 */
+		permission: {
+			update: string;
+			delete: string;
+			page: string;
+			list: string;
+			info: string;
+			add: string;
+		};
+
+		/**
+		 * 权限状态
+		 */
+		_permission: {
+			update: boolean;
+			delete: boolean;
+			page: boolean;
+			list: boolean;
+			info: boolean;
+			add: boolean;
+		};
+
+		request: Request;
+	}
+
+	interface ForumPointLog {
+		/**
+		 * 分页查询
+		 */
+		page(data?: any): Promise<ForumPointLogPageResponse>;
+
+		/**
+		 * 列表查询
+		 */
+		list(data?: any): Promise<ForumPointLogEntity[]>;
+
+		/**
+		 * 单个信息
+		 */
+		info(data?: any): Promise<ForumPointLogEntity>;
+
+		/**
+		 * 权限标识
+		 */
+		permission: { page: string; list: string; info: string };
+
+		/**
+		 * 权限状态
+		 */
+		_permission: { page: boolean; list: boolean; info: boolean };
+
+		request: Request;
+	}
+
+	interface ForumPost {
+		/**
+		 * 删除帖子
+		 */
+		deletePost(data?: any): Promise<any>;
+
+		/**
+		 * 置顶/取消置顶
+		 */
+		togglePin(data?: any): Promise<any>;
+
+		/**
+		 * 帖子评论树
+		 */
+		comments(data?: any): Promise<any>;
+
+		/**
+		 * 分页查询
+		 */
+		page(data?: any): Promise<ForumPostPageResponse>;
+
+		/**
+		 * 列表查询
+		 */
+		list(data?: any): Promise<ForumPostEntity[]>;
+
+		/**
+		 * 单个信息
+		 */
+		info(data?: any): Promise<ForumPostEntity>;
+
+		/**
+		 * 权限标识
+		 */
+		permission: {
+			deletePost: string;
+			togglePin: string;
+			comments: string;
+			page: string;
+			list: string;
+			info: string;
+		};
+
+		/**
+		 * 权限状态
+		 */
+		_permission: {
+			deletePost: boolean;
+			togglePin: boolean;
+			comments: boolean;
+			page: boolean;
+			list: boolean;
+			info: boolean;
+		};
+
+		request: Request;
+	}
+
+	interface ForumUser {
+		/**
+		 * 重置密码
+		 */
+		resetPassword(data?: any): Promise<any>;
+
+		/**
+		 * 封禁/解封/禁言
+		 */
+		changeStatus(data?: any): Promise<any>;
+
+		/**
+		 * 调整积分
+		 */
+		adjustPoints(data?: any): Promise<any>;
+
+		/**
+		 * 修改角色
+		 */
+		changeRole(data?: any): Promise<any>;
+
+		/**
+		 * 分页查询
+		 */
+		page(data?: any): Promise<ForumUserPageResponse>;
+
+		/**
+		 * 列表查询
+		 */
+		list(data?: any): Promise<ForumUserEntity[]>;
+
+		/**
+		 * 单个信息
+		 */
+		info(data?: any): Promise<ForumUserEntity>;
+
+		/**
+		 * 权限标识
+		 */
+		permission: {
+			resetPassword: string;
+			changeStatus: string;
+			adjustPoints: string;
+			changeRole: string;
+			page: string;
+			list: string;
+			info: string;
+		};
+
+		/**
+		 * 权限状态
+		 */
+		_permission: {
+			resetPassword: boolean;
+			changeStatus: boolean;
+			adjustPoints: boolean;
+			changeRole: boolean;
+			page: boolean;
+			list: boolean;
+			info: boolean;
+		};
+
+		request: Request;
+	}
+
 	interface PluginInfo {
 		/**
 		 * 安装插件
@@ -2206,6 +2944,14 @@ declare namespace Eps {
 		};
 		demo: { goods: DemoGoods; tenant: DemoTenant };
 		dict: { info: DictInfo; type: DictType };
+		forum: {
+			advert: ForumAdvert;
+			announcement: ForumAnnouncement;
+			category: ForumCategory;
+			pointLog: ForumPointLog;
+			post: ForumPost;
+			user: ForumUser;
+		};
 		plugin: { info: PluginInfo };
 		recycle: { data: RecycleData };
 		space: { info: SpaceInfo; type: SpaceType };

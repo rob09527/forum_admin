@@ -1,0 +1,235 @@
+[
+  {
+    "name": "论坛管理",
+    "router": "/forum",
+    "perms": null,
+    "type": 0,
+    "icon": "icon-activity",
+    "orderNum": 12,
+    "viewPath": null,
+    "keepAlive": true,
+    "isShow": true,
+    "childMenus": [
+      {
+        "name": "用户列表",
+        "router": "/forum/user",
+        "perms": null,
+        "type": 1,
+        "icon": "icon-user",
+        "orderNum": 1,
+        "viewPath": "modules/forum/views/user/list.vue",
+        "keepAlive": true,
+        "isShow": true,
+        "childMenus": [
+          {
+            "name": "修改角色",
+            "router": null,
+            "perms": "forum:user:changeRole",
+            "type": 2,
+            "icon": null,
+            "orderNum": 1,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          },
+          {
+            "name": "修改状态",
+            "router": null,
+            "perms": "forum:user:changeStatus",
+            "type": 2,
+            "icon": null,
+            "orderNum": 2,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          },
+          {
+            "name": "调整积分",
+            "router": null,
+            "perms": "forum:user:adjustPoints",
+            "type": 2,
+            "icon": null,
+            "orderNum": 3,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          },
+          {
+            "name": "重置密码",
+            "router": null,
+            "perms": "forum:user:resetPassword",
+            "type": 2,
+            "icon": null,
+            "orderNum": 4,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          }
+        ]
+      },
+      {
+        "name": "帖子列表",
+        "router": "/forum/post",
+        "perms": null,
+        "type": 1,
+        "icon": "icon-doc",
+        "orderNum": 2,
+        "viewPath": "modules/forum/views/post/list.vue",
+        "keepAlive": true,
+        "isShow": true,
+        "childMenus": [
+          {
+            "name": "置顶/取消置顶",
+            "router": null,
+            "perms": "forum:post:togglePin",
+            "type": 2,
+            "icon": null,
+            "orderNum": 1,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          },
+          {
+            "name": "删除帖子",
+            "router": null,
+            "perms": "forum:post:deletePost",
+            "type": 2,
+            "icon": null,
+            "orderNum": 2,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          }
+        ]
+      },
+      {
+        "name": "积分明细",
+        "router": "/forum/pointlog",
+        "perms": null,
+        "type": 1,
+        "icon": "icon-amount",
+        "orderNum": 3,
+        "viewPath": "modules/forum/views/pointlog/list.vue",
+        "keepAlive": true,
+        "isShow": true,
+        "childMenus": []
+      },
+      {
+        "name": "分类管理",
+        "router": "/forum/category",
+        "perms": null,
+        "type": 1,
+        "icon": "icon-folder",
+        "orderNum": 4,
+        "viewPath": "modules/forum/views/category/list.vue",
+        "keepAlive": true,
+        "isShow": true,
+        "childMenus": []
+      },
+      {
+        "name": "公告管理",
+        "router": "/forum/announcement",
+        "perms": null,
+        "type": 1,
+        "icon": "icon-notice",
+        "orderNum": 5,
+        "viewPath": "modules/forum/views/announcement/list.vue",
+        "keepAlive": true,
+        "isShow": true,
+        "childMenus": [
+          {
+            "name": "新增公告",
+            "router": null,
+            "perms": "forum:announcement:add",
+            "type": 2,
+            "icon": null,
+            "orderNum": 1,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          },
+          {
+            "name": "修改公告",
+            "router": null,
+            "perms": "forum:announcement:update",
+            "type": 2,
+            "icon": null,
+            "orderNum": 2,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          },
+          {
+            "name": "删除公告",
+            "router": null,
+            "perms": "forum:announcement:delete",
+            "type": 2,
+            "icon": null,
+            "orderNum": 3,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          }
+        ]
+      },
+      {
+        "name": "广告管理",
+        "router": "/forum/advert",
+        "perms": null,
+        "type": 1,
+        "icon": "icon-goods",
+        "orderNum": 6,
+        "viewPath": "modules/forum/views/advert/list.vue",
+        "keepAlive": true,
+        "isShow": true,
+        "childMenus": [
+          {
+            "name": "新增广告",
+            "router": null,
+            "perms": "forum:advert:add",
+            "type": 2,
+            "icon": null,
+            "orderNum": 1,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          },
+          {
+            "name": "修改广告",
+            "router": null,
+            "perms": "forum:advert:update",
+            "type": 2,
+            "icon": null,
+            "orderNum": 2,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          },
+          {
+            "name": "删除广告",
+            "router": null,
+            "perms": "forum:advert:delete",
+            "type": 2,
+            "icon": null,
+            "orderNum": 3,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -51,6 +51,14 @@ export default {
       },
     },
   },
+  // forum server 服务间调用配置（admin 后端转发复杂写操作到 forum server）
+  forum: {
+    // forum server 地址
+    serverUrl: process.env.FORUM_SERVER_URL || 'http://127.0.0.1:3001',
+    // 服务间密钥，需与 forum server 的 FORUM_ADMIN_KEY 一致。
+    // 无默认值：未配置时转发调用会因密钥为空被 forum server 拒绝（forum server 侧必填校验兜底）
+    adminKey: process.env.FORUM_ADMIN_KEY || '',
+  },
   cool: {
     // 已经插件化，本地文件上传查看 plugin/config.ts，其他云存储查看对应插件的使用
     file: {},

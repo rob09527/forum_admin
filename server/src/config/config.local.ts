@@ -15,8 +15,8 @@ export default {
         username: 'rob',
         password: '',
         database: 'forum',
-        // 自动建表 注意：线上部署的时候不要使用，有可能导致数据丢失
-        synchronize: true,
+        // 与 forum server 共用库，禁止 TypeORM 自动建表/改表，避免污染 Prisma 管理的 schema
+        synchronize: false,
         // 打印日志
         logging: false,
         // 是否开启缓存
