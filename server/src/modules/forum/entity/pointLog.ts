@@ -7,7 +7,8 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
  * 关键约束同 user/post/comment 实体：继承 CoolBaseEntity 空基类，
  * 自行定义 id/createdAt，避免 BaseEntity 带出的 createTime/updateTime/tenantId 污染。
  */
-@Entity('point_logs')
+// 表结构由 Prisma 迁移管理，排除 TypeORM 同步
+@Entity({ name: 'point_logs', synchronize: false })
 export class ForumPointLogEntity extends CoolBaseEntity {
   @PrimaryGeneratedColumn('increment', { comment: '流水 ID' })
   id: number;

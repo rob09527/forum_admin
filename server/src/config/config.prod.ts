@@ -4,18 +4,16 @@ import { entities } from '../entities';
 import { TenantSubscriber } from '../modules/base/db/tenant';
 
 /**
- * 本地开发 npm run prod 读取的配置文件
+ * 生产环境配置。
+ * 数据库连接从 DATABASE_URL 环境变量读取（与 forum server 命名一致，TypeORM 支持 url 连接串），
+ * 不再硬编码 127.0.0.1/rob。生产漏配 DATABASE_URL 会在启动连接时报错 fail-fast。
  */
 export default {
   typeorm: {
     dataSource: {
       default: {
         type: 'postgres',
-        host: '127.0.0.1',
-        port: 5432,
-        username: 'rob',
-        password: '',
-        database: 'forum',
+        url: process.env.DATABASE_URL,
         // 自动建表 注意：线上部署的时候不要使用，有可能导致数据丢失
         synchronize: false,
         // 打印日志

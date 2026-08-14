@@ -9,7 +9,8 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
  *   直接继承 CoolBaseEntity 空基类，自行定义 id/createdAt/updatedAt。
  * - content 为 Markdown 正文，较大；列表 select 里不含它，详情走 info 按需拉取。
  */
-@Entity('posts')
+// 表结构由 Prisma 迁移管理，排除 TypeORM 同步（synchronize:true 会删未映射列，如 users.passwordHash）
+@Entity({ name: 'posts', synchronize: false })
 export class ForumPostEntity extends CoolBaseEntity {
   @PrimaryGeneratedColumn('increment', { comment: '帖子 ID' })
   id: number;

@@ -8,10 +8,10 @@ import { availablePort } from '../comm/port';
 import { redisStore } from 'cache-manager-ioredis-yet';
 
 export default {
-  // 确保每个项目唯一，项目首次启动会自动生成
-  keys: '9cbe2380-877b-4fa9-b9fd-33a27c2e7486',
+  // 会话/签名密钥。生产必须注入 MIDWAY_KEYS 随机值；默认值仅限本地开发
+  keys: process.env.MIDWAY_KEYS || '9cbe2380-877b-4fa9-b9fd-33a27c2e7486',
   koa: {
-    port: availablePort(8001),
+    port: Number(process.env.ADMIN_PORT) || availablePort(8001),
   },
   // 开启异步上下文管理
   asyncContextManager: {
@@ -36,15 +36,15 @@ export default {
     fileSize: '200mb',
     whitelist: null,
   },
-  // 缓存 使用 redis，与 forum server 共用同一个 redis 实例
+  // 缓存 使用 redis，与 forum server 共用同一个 redis 实例；host/port/password 走环境变量，本地有默认值
   cacheManager: {
     clients: {
       default: {
         store: redisStore,
         options: {
-          port: 6379,
-          host: '127.0.0.1',
-          password: '',
+          port: Number(process.env.REDIS_PORT) || 6379,
+          host: process.env.REDIS_HOST || '127.0.0.1',
+          password: process.env.REDIS_PASSWORD || '',
           ttl: 0,
           db: 0,
         },

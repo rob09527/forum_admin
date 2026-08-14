@@ -114,7 +114,7 @@ export class CoolPlugin extends BasePluginHook implements BaseUpload {
     this.validateTargetPath(targetPath, basePath);
 
     fs.writeFileSync(targetPath, data);
-    return `${domain}/upload/${dateDir}/${safeFileName}`;
+    return `${domain}/upload/${dateDir}/${encodeURIComponent(safeFileName)}`;
   }
 
   /**
@@ -145,7 +145,7 @@ export class CoolPlugin extends BasePluginHook implements BaseUpload {
     }
 
     fs.writeFileSync(targetPath, data);
-    return `${domain}/upload/${dateDir}/${safeKey}`;
+    return `${domain}/upload/${dateDir}/${encodeURIComponent(safeKey)}`;
   }
 
   /**

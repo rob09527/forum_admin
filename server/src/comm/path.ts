@@ -4,15 +4,13 @@ import * as md5 from 'md5';
 import * as fs from 'fs';
 
 /**
- * 获得配置文件中的 keys
+ * 获得配置文件中的 keys。
+ * 注意：config.default.ts 的 keys 已改为 env 驱动（process.env.MIDWAY_KEYS || 默认值），
+ * 编译后形如 `keys: process.env.MIDWAY_KEYS || '...'`，不能用正则解析字面量。
+ * 这里直接读同一来源，保证与 config 一致。
  * @returns
  */
-const getKeys = () => {
-  const configFile = path.join(__dirname, '../config/config.default.js');
-  const configContent = fs.readFileSync(configFile, 'utf8');
-  const keys = configContent.match(/keys: '([^']+)'/)?.[1];
-  return keys;
-};
+const getKeys = () => process.env.MIDWAY_KEYS || '9cbe2380-877b-4fa9-b9fd-33a27c2e7486';
 
 /**
  * 项目数据目录

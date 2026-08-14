@@ -19,8 +19,11 @@ export default options => {
     hooks: {
       // 文件上传
       upload: {
-        // 地址前缀
-        domain: `http://127.0.0.1:${options?.app?.getConfig('koa.port')}`,
+        // 地址前缀（上传返回的完整外链域名）。生产必须注入 UPLOAD_DOMAIN，
+        // 否则返回 127.0.0.1 绝对地址，存进 DB（如广告图）后外部无法访问
+        domain:
+          process.env.UPLOAD_DOMAIN ||
+          `http://127.0.0.1:${options?.app?.getConfig('koa.port')}`,
       },
     },
   } as ModuleConfig;

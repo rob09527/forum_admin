@@ -8,7 +8,8 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
  * 避免 BaseEntity 带出的 createTime/updateTime/tenantId 污染。
  * 该表由 forum server 的 Prisma 迁移创建（见 server/prisma/migrations/*_add_adverts）。
  */
-@Entity('adverts')
+// 表结构由 Prisma 迁移管理，排除 TypeORM 同步
+@Entity({ name: 'adverts', synchronize: false })
 export class ForumAdvertEntity extends CoolBaseEntity {
   @PrimaryGeneratedColumn('increment', { comment: '广告 ID' })
   id: number;

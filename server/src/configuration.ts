@@ -54,7 +54,8 @@ import { ForumAdvertEntity } from './modules/forum/entity/advert';
     // task,
     {
       component: info,
-      enabledEnvironment: ['local', 'prod'],
+      // npm run dev → NODE_ENV=local；npm run start → NODE_ENV=production（Midway 别名映射到 prod 配置）
+      enabledEnvironment: ['local', 'production'],
     },
   ],
   importConfigs: [
@@ -131,8 +132,9 @@ export class MainConfiguration {
         'forum schema 漂移：entity 声明的列在数据库中不存在，TypeORM 查询将报错（可能是 forum server 迁移已改动表结构）: ' +
         fatal.join(', ');
       this.logger.error(msg);
-      // 生产 fail-fast，避免带病启动；dev 只报错方便排查
-      if (process.env.NODE_ENV === 'prod') {
+      // 生产 fail-fast，避免带病启动；dev 只报错方便排查。
+      // 注意 NODE_ENV 是 'production'（'prod' 只是 Midway 内部环境别名，不是 process.env 值）
+      if (process.env.NODE_ENV === 'production') {
         throw new Error(msg);
       }
     }

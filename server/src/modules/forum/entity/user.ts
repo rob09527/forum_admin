@@ -9,7 +9,8 @@ import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
  *   直接继承 CoolBaseEntity 空基类，自行定义 id/createdAt/updatedAt。
  * - 敏感字段 passwordHash、oauthId 刻意不映射，杜绝任何接口泄漏。
  */
-@Entity('users')
+// 表结构由 Prisma 迁移管理，排除 TypeORM 同步（synchronize:true 会删未映射的 passwordHash/oauthId）
+@Entity({ name: 'users', synchronize: false })
 export class ForumUserEntity extends CoolBaseEntity {
   @PrimaryGeneratedColumn('increment', { comment: '用户 ID' })
   id: number;

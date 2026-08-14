@@ -1,30 +1,24 @@
-# 本地数据库环境
-# 数据存放在当前目录下的 data里
-# 推荐使用安装了docker扩展的vscode打开目录 在本文件上右键可以快速启动，停止
-# 如不需要相关容器开机自启动，可注释掉 restart: always
-# 如遇端口冲突 可调整ports下 :前面的端口号
+# 本地依赖环境（PostgreSQL + Redis）。
+# 原官方模板是 MySQL，本项目已改用 PostgreSQL（与 forum server 共用），已替换。
+# 启动：docker compose up -d
+# 连接串示例（本机无密码开发环境）：postgresql://forum:forum@localhost:5432/forum
 version: "3.1"
 
 services:
   coolDB:
-    image: mysql
-    command:
-      --default-authentication-plugin=mysql_native_password
-      --sql_mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
-      --group_concat_max_len=102400
+    image: postgres:16-alpine
     restart: always
     volumes:
-      - ./data/mysql/:/var/lib/mysql/
+      - ./data/postgres/:/var/lib/postgresql/data/
     environment:
       TZ: Asia/Shanghai # 指定时区
-      MYSQL_ROOT_PASSWORD: "123456" # 配置root用户密码
-      MYSQL_DATABASE: "cool" # 业务库名
-      MYSQL_USER: "root" # 业务库用户名
-      MYSQL_PASSWORD: "123456" # 业务库密码
+      POSTGRES_USER: forum
+      POSTGRES_PASSWORD: forum
+      POSTGRES_DB: forum # 业务库名
     networks:
       - cool
     ports:
-      - 3306:3306
+      - 5432:5432
 
   coolRedis:
     image: redis
