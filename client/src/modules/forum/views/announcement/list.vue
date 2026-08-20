@@ -110,6 +110,7 @@ defineOptions({
 
 import { useCrud, useTable } from '@cool-vue/crud';
 import { useCool } from '/@/cool';
+import { showError } from '/@/cool/utils';
 import { useI18n } from 'vue-i18n';
 import { computed, reactive, ref } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
@@ -315,6 +316,11 @@ async function save() {
 		ElMessage.warning('请填写标题');
 		return;
 	}
+	// 外链选了 URL 必填（防止裸提交静默存成 null）
+	if (form.linkType === 'external' && !form.linkUrl.trim()) {
+		ElMessage.warning('请填写外链地址');
+		return;
+	}
 	// 站内选了需要填 ID 的，校验后缀非空
 	if (form.linkType === 'internal') {
 		const kind = currentInternalKind.value;
@@ -340,7 +346,8 @@ async function save() {
 		formVisible.value = false;
 		Crud.value?.refresh();
 	} catch (err) {
-		// 错误消息由请求层统一提示
+		// 业务错误（如标题重复）请求层只 reject 不弹窗，这里统一提示
+		showError(err, '保存失败');
 	}
 }
 
@@ -357,7 +364,11 @@ function removeAnnouncement(row: any) {
 			ElMessage.success('已删除');
 			Crud.value?.refresh();
 		})
-		.catch(() => {});
+		.catch((err) => {
+			// 确认框取消（'cancel'/'close'）静默，真实请求失败才提示
+			if (err === 'cancel' || err === 'close') return;
+			showError(err, '删除失败');
+		});
 }
 </script>
 

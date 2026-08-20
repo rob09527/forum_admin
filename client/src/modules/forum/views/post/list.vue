@@ -63,6 +63,7 @@ defineOptions({
 
 import { useCrud, useTable } from '@cool-vue/crud';
 import { useCool } from '/@/cool';
+import { showError } from '/@/cool/utils';
 import { useI18n } from 'vue-i18n';
 import { reactive, ref } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
@@ -193,7 +194,8 @@ async function openDetail(row: any) {
 		detail.value.content = info?.content ?? '';
 		flatComments.value = flattenComments(comments || []);
 	} catch (err) {
-		ElMessage.error('加载详情失败');
+		// 展示后端真实错误（如帖子不存在），network 错误兜底文案
+		showError(err, '加载详情失败');
 	}
 }
 
@@ -234,7 +236,11 @@ function removePost(row: any) {
 			ElMessage.success('已删除');
 			Crud.value?.refresh();
 		})
-		.catch(() => {});
+		.catch((err) => {
+			// 确认框取消（'cancel'/'close'）静默，真实请求失败才提示
+			if (err === 'cancel' || err === 'close') return;
+			showError(err, '删除失败');
+		});
 }
 </script>
 

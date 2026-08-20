@@ -2355,6 +2355,35 @@ declare namespace Eps {
 		request: Request;
 	}
 
+	interface ForumConfig {
+		/**
+		 * 保存签到奖励配置
+		 */
+		saveCheckin(data?: any): Promise<any>;
+
+		/**
+		 * 保存等级配置
+		 */
+		saveLevels(data?: any): Promise<any>;
+
+		/**
+		 * 读取签到/等级配置
+		 */
+		getConfig(data?: any): Promise<any>;
+
+		/**
+		 * 权限标识
+		 */
+		permission: { saveCheckin: string; saveLevels: string; getConfig: string };
+
+		/**
+		 * 权限状态
+		 */
+		_permission: { saveCheckin: boolean; saveLevels: boolean; getConfig: boolean };
+
+		request: Request;
+	}
+
 	interface ForumPointLog {
 		/**
 		 * 分页查询
@@ -2948,6 +2977,7 @@ declare namespace Eps {
 			advert: ForumAdvert;
 			announcement: ForumAnnouncement;
 			category: ForumCategory;
+			config: ForumConfig;
 			pointLog: ForumPointLog;
 			post: ForumPost;
 			user: ForumUser;

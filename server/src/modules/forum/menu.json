@@ -229,6 +229,55 @@
             "childMenus": []
           }
         ]
+      },
+      {
+        "name": "配置管理",
+        "router": "/forum/config",
+        "perms": null,
+        "type": 1,
+        "icon": "icon-setting",
+        "orderNum": 7,
+        "viewPath": "modules/forum/views/config/index.vue",
+        "keepAlive": true,
+        "isShow": true,
+        "childMenus": [
+          {
+            "name": "读取配置",
+            "router": null,
+            "perms": "forum:config:getConfig",
+            "type": 2,
+            "icon": null,
+            "orderNum": 1,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          },
+          {
+            "name": "保存签到配置",
+            "router": null,
+            "perms": "forum:config:saveCheckin",
+            "type": 2,
+            "icon": null,
+            "orderNum": 2,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          },
+          {
+            "name": "保存等级配置",
+            "router": null,
+            "perms": "forum:config:saveLevels",
+            "type": 2,
+            "icon": null,
+            "orderNum": 3,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          }
+        ]
       }
     ]
   }

@@ -31,6 +31,7 @@ defineOptions({
 
 import { useCrud, useTable, useUpsert } from '@cool-vue/crud';
 import { useCool } from '/@/cool';
+import { showError } from '/@/cool/utils';
 import { useI18n } from 'vue-i18n';
 import { reactive, ref } from 'vue';
 import { ElMessage } from 'element-plus';
@@ -238,7 +239,7 @@ const Upsert = useUpsert({
 			Crud.value?.refresh();
 			close();
 		} catch (e: any) {
-			ElMessage.error(e?.message || '操作失败');
+			showError(e, '操作失败');
 		} finally {
 			done();
 		}
