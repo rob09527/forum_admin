@@ -44,6 +44,12 @@ export class ForumUserEntity extends CoolBaseEntity {
   @Column({ type: 'int', comment: '评论数', default: 0 })
   commentCount: number;
 
+  @Column({ type: 'int', comment: '粉丝数（冗余，关注/取关时同步增减）', default: 0 })
+  followerCount: number;
+
+  @Column({ type: 'int', comment: '关注数（冗余）', default: 0 })
+  followingCount: number;
+
   @Column({ type: 'text', comment: '角色 user/mod/admin', default: 'user' })
   role: string;
 

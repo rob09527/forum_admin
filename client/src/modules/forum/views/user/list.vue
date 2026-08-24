@@ -115,6 +115,16 @@ const Table = useTable({
 			width: 70
 		},
 		{
+			label: t('关注'),
+			prop: 'followingCount',
+			width: 70
+		},
+		{
+			label: t('粉丝'),
+			prop: 'followerCount',
+			width: 70
+		},
+		{
 			label: t('状态'),
 			prop: 'status',
 			dict: options.status,

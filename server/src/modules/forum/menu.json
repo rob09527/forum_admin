@@ -182,12 +182,37 @@
         ]
       },
       {
+        "name": "通知管理",
+        "router": "/forum/notification",
+        "perms": null,
+        "type": 1,
+        "icon": "icon-notice",
+        "orderNum": 6,
+        "viewPath": "modules/forum/views/notification/list.vue",
+        "keepAlive": true,
+        "isShow": true,
+        "childMenus": [
+          {
+            "name": "群发系统通知",
+            "router": null,
+            "perms": "forum:notification:broadcast",
+            "type": 2,
+            "icon": null,
+            "orderNum": 1,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          }
+        ]
+      },
+      {
         "name": "广告管理",
         "router": "/forum/advert",
         "perms": null,
         "type": 1,
         "icon": "icon-goods",
-        "orderNum": 6,
+        "orderNum": 7,
         "viewPath": "modules/forum/views/advert/list.vue",
         "keepAlive": true,
         "isShow": true,
@@ -236,7 +261,7 @@
         "perms": null,
         "type": 1,
         "icon": "icon-setting",
-        "orderNum": 7,
+        "orderNum": 8,
         "viewPath": "modules/forum/views/config/index.vue",
         "keepAlive": true,
         "isShow": true,

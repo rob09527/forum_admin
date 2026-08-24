@@ -1,3 +1,6 @@
+// 加载 .env（与 forum server 的 config.ts 同款模式）：本地开发密钥/地址统一放
+// admin/server/.env；生产由 docker-compose 注入进程环境变量（dotenv 不覆盖已存在的环境变量）
+import 'dotenv/config';
 import * as orm from '@midwayjs/typeorm';
 import { InjectDataSource } from '@midwayjs/typeorm';
 import {

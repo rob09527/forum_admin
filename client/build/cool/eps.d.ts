@@ -648,6 +648,68 @@ declare namespace Eps {
 		[key: string]: any;
 	}
 
+	interface ForumNotificationEntity {
+		/**
+		 * 通知 ID
+		 */
+		id?: number;
+
+		/**
+		 * 接收者用户 ID
+		 */
+		userId?: number;
+
+		/**
+		 * 类型 comment/reply/like/follow/system
+		 */
+		type?: string;
+
+		/**
+		 * 触发者 ID 列表（只存最近 3 个）
+		 */
+		actorIds?: number;
+
+		/**
+		 * 触发者总数（聚合累计事件数）
+		 */
+		actorCount?: number;
+
+		/**
+		 * 关联帖子 ID，可跳转
+		 */
+		postId?: number;
+
+		/**
+		 * 关联评论 ID
+		 */
+		commentId?: number;
+
+		/**
+		 * 群发消息 ID，正文存于 notification_messages 表
+		 */
+		messageId?: number;
+
+		/**
+		 * 系统通知正文，仅 system 有；新群发经 messageId 解析，存量行仍在本列
+		 */
+		content?: string;
+
+		/**
+		 * 是否已读
+		 */
+		isRead?: boolean;
+
+		/**
+		 * 通知时间
+		 */
+		createdAt?: timestamp;
+
+		/**
+		 * 任意键值
+		 */
+		[key: string]: any;
+	}
+
 	interface ForumPointLogEntity {
 		/**
 		 * 流水 ID
@@ -822,6 +884,16 @@ declare namespace Eps {
 		 * 评论数
 		 */
 		commentCount?: number;
+
+		/**
+		 * 粉丝数（冗余，关注/取关时同步增减）
+		 */
+		followerCount?: number;
+
+		/**
+		 * 关注数（冗余）
+		 */
+		followingCount?: number;
 
 		/**
 		 * 角色 user/mod/admin
@@ -1426,6 +1498,11 @@ declare namespace Eps {
 	interface ForumCategoryPageResponse {
 		pagination: PagePagination;
 		list: ForumCategoryEntity[];
+	}
+
+	interface ForumNotificationPageResponse {
+		pagination: PagePagination;
+		list: ForumNotificationEntity[];
 	}
 
 	interface ForumPointLogPageResponse {
@@ -2384,6 +2461,51 @@ declare namespace Eps {
 		request: Request;
 	}
 
+	interface ForumNotification {
+		/**
+		 * 群发系统通知
+		 */
+		broadcast(data?: any): Promise<any>;
+
+		/**
+		 * 删除
+		 */
+		delete(data?: any): Promise<any>;
+
+		/**
+		 * 分页查询
+		 */
+		page(data?: any): Promise<ForumNotificationPageResponse>;
+
+		/**
+		 * 列表查询
+		 */
+		list(data?: any): Promise<ForumNotificationEntity[]>;
+
+		/**
+		 * 单个信息
+		 */
+		info(data?: any): Promise<ForumNotificationEntity>;
+
+		/**
+		 * 权限标识
+		 */
+		permission: { broadcast: string; delete: string; page: string; list: string; info: string };
+
+		/**
+		 * 权限状态
+		 */
+		_permission: {
+			broadcast: boolean;
+			delete: boolean;
+			page: boolean;
+			list: boolean;
+			info: boolean;
+		};
+
+		request: Request;
+	}
+
 	interface ForumPointLog {
 		/**
 		 * 分页查询
@@ -2978,6 +3100,7 @@ declare namespace Eps {
 			announcement: ForumAnnouncement;
 			category: ForumCategory;
 			config: ForumConfig;
+			notification: ForumNotification;
 			pointLog: ForumPointLog;
 			post: ForumPost;
 			user: ForumUser;

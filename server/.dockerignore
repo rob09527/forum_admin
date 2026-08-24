@@ -3,3 +3,6 @@ dist/
 logs/
 .git/
 .DS_Store
+.env
+.env.local
+.env.*.local

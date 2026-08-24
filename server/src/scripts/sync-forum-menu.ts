@@ -83,7 +83,11 @@ async function main(): Promise<void> {
   await ds.destroy();
 }
 
-main().catch((err) => {
-  console.error('[menu-sync] 同步失败:', err instanceof Error ? err.message : err);
-  process.exit(1);
-});
+// 仅在被直接执行时（node dist/scripts/sync-forum-menu.js）运行；被 Midway 目录扫描 require 时
+// （如本地 npm run dev）不触发，否则无 DATABASE_URL 会在启动阶段抛错导致整个后端崩溃。
+if (require.main === module) {
+  main().catch((err) => {
+    console.error('[menu-sync] 同步失败:', err instanceof Error ? err.message : err);
+    process.exit(1);
+  });
+}
