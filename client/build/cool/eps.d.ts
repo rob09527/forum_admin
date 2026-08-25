@@ -601,6 +601,93 @@ declare namespace Eps {
 		[key: string]: any;
 	}
 
+	interface ForumBountyEntity {
+		/**
+		 * 悬赏 ID
+		 */
+		id?: number;
+
+		/**
+		 * 悬赏帖 ID。裸 ID 不建外键；一帖一悬赏故唯一
+		 */
+		postId?: number;
+
+		/**
+		 * 发起人 ID
+		 */
+		userId?: number;
+
+		/**
+		 * 托管金额。发起时已从发起人余额一次性扣除，不落在任何用户账户，仅记账
+		 */
+		amount?: number;
+
+		/**
+		 * 状态：escrow(托管中) | settled(已采纳) | refunded(已退款)
+		 */
+		status?: string;
+
+		/**
+		 * 超时时间 = 发起时刻 + 配置天数（默认 7）。定时结算的判定依据
+		 */
+		expireAt?: timestamp;
+
+		/**
+		 * 被采纳的回答评论 ID（结算快照），事后被删不影响已结算
+		 */
+		acceptedCommentId?: number;
+
+		/**
+		 * 被采纳的回答者 ID（结算快照）
+		 */
+		acceptedUserId?: number;
+
+		/**
+		 * 实发金额 = amount − fee；退款时为 null
+		 */
+		payout?: number;
+
+		/**
+		 * 手续费（销毁，计入悬赏账目）；退款不抽水，故退款时为 null
+		 */
+		fee?: number;
+
+		/**
+		 * 结算方式：accept(人工采纳) | auto(超时自动判给最高赞) | cancel(发起人取消) | admin(后台人工退款)
+		 */
+		settleType?: string;
+
+		/**
+		 * 结算时间；未结算为 null
+		 */
+		settledAt?: timestamp;
+
+		/**
+		 * 后台人工退款的操作者用户名（审计追责）
+		 */
+		operator?: string;
+
+		/**
+		 * 创建时间
+		 */
+		createdAt?: timestamp;
+
+		/**
+		 * 用户名
+		 */
+		userName?: string;
+
+		/**
+		 * 用户名
+		 */
+		acceptedUserName?: string;
+
+		/**
+		 * 任意键值
+		 */
+		[key: string]: any;
+	}
+
 	interface ForumCategoryEntity {
 		/**
 		 * 分类 ID
@@ -641,6 +728,78 @@ declare namespace Eps {
 		 * 最后更新时间
 		 */
 		updatedAt?: timestamp;
+
+		/**
+		 * 任意键值
+		 */
+		[key: string]: any;
+	}
+
+	interface ForumUserDecorationEntity {
+		/**
+		 * 持有记录 ID
+		 */
+		id?: number;
+
+		/**
+		 * 持有用户 ID
+		 */
+		userId?: number;
+
+		/**
+		 * 商品 ID；续费需要跳回商品，故商品禁删只能下架
+		 */
+		itemId?: number;
+
+		/**
+		 * 装饰类型（冗余自 ShopItem.type：username_color | title）
+		 */
+		type?: string;
+
+		/**
+		 * 购买时快照的渲染值 —— 商品事后改价/改值/下架不回溯已购用户
+		 */
+		renderValue?: string;
+
+		/**
+		 * 购买时快照的样式 key（称号徽章配色），颜色类为 null
+		 */
+		renderStyle?: string;
+
+		/**
+		 * 实付价格快照（后台客诉排查「我当时花了多少」）
+		 */
+		price?: number;
+
+		/**
+		 * 本次生效起始时间
+		 */
+		startAt?: timestamp;
+
+		/**
+		 * 到期时间；过期记录不删除，置灰展示 + 一键续费
+		 */
+		expireAt?: timestamp;
+
+		/**
+		 * 到期通知已发送的时间；null 表示未发（幂等标记）
+		 */
+		expiredNotifiedAt?: timestamp;
+
+		/**
+		 * 创建时间
+		 */
+		createdAt?: timestamp;
+
+		/**
+		 * 最后更新时间
+		 */
+		updatedAt?: timestamp;
+
+		/**
+		 * 用户名
+		 */
+		userName?: string;
 
 		/**
 		 * 任意键值
@@ -827,6 +986,125 @@ declare namespace Eps {
 		 * 用户名
 		 */
 		authorName?: string;
+
+		/**
+		 * 任意键值
+		 */
+		[key: string]: any;
+	}
+
+	interface ForumShopItemEntity {
+		/**
+		 * 商品 ID
+		 */
+		id?: number;
+
+		/**
+		 * 装饰类型：username_color(用户名颜色) | title(专属称号)，同类互相覆盖、不同类共存
+		 */
+		type?: string;
+
+		/**
+		 * 商品名（前台展示，如「幻紫」）
+		 */
+		name?: string;
+
+		/**
+		 * 渲染值：颜色类为 CSS 色值/渐变；称号类为称号文本。购买时快照到 UserDecoration 与 User 槽位
+		 */
+		renderValue?: string;
+
+		/**
+		 * 附加样式 key（称号徽章配色 amber/violet/emerald），颜色类为 null
+		 */
+		renderStyle?: string;
+
+		/**
+		 * 价格（鸡腿），改价不影响已售出（购买即快照渲染值）
+		 */
+		price?: number;
+
+		/**
+		 * 时效天数（入门色 7 / 精选色与称号 30）
+		 */
+		durationDays?: number;
+
+		/**
+		 * 是否上架；下架后商城隐藏、不可购买，已持有者不受影响
+		 */
+		isActive?: boolean;
+
+		/**
+		 * 排序权重，越小越靠前
+		 */
+		sortOrder?: number;
+
+		/**
+		 * 创建时间
+		 */
+		createdAt?: timestamp;
+
+		/**
+		 * 最后更新时间
+		 */
+		updatedAt?: timestamp;
+
+		/**
+		 * 任意键值
+		 */
+		[key: string]: any;
+	}
+
+	interface ForumTipEntity {
+		/**
+		 * 打赏记录 ID
+		 */
+		id?: number;
+
+		/**
+		 * 打赏者 ID
+		 */
+		fromUserId?: number;
+
+		/**
+		 * 接收者 ID（内容作者）。冗余存储而非 JOIN 内容表取 —— 内容删除后仍能按接收方聚合 [T4]
+		 */
+		toUserId?: number;
+
+		/**
+		 * 打赏目标类型：post | comment
+		 */
+		targetType?: string;
+
+		/**
+		 * 目标 ID。裸 ID 不建外键，与 PointLog.refId 同口径；内容删除后本行保留
+		 */
+		targetId?: number;
+
+		/**
+		 * 打赏金额（鸡腿）；不抽水，全额到账 [R47]
+		 */
+		amount?: number;
+
+		/**
+		 * 打赏留言，最长 20 字，选填 [1.5.3]
+		 */
+		message?: string;
+
+		/**
+		 * 打赏时间
+		 */
+		createdAt?: timestamp;
+
+		/**
+		 * 用户名
+		 */
+		fromUserName?: string;
+
+		/**
+		 * 用户名
+		 */
+		toUserName?: string;
 
 		/**
 		 * 任意键值
@@ -1495,9 +1773,19 @@ declare namespace Eps {
 		list: ForumAnnouncementEntity[];
 	}
 
+	interface ForumBountyPageResponse {
+		pagination: PagePagination;
+		list: ForumBountyEntity[];
+	}
+
 	interface ForumCategoryPageResponse {
 		pagination: PagePagination;
 		list: ForumCategoryEntity[];
+	}
+
+	interface ForumDecorationPageResponse {
+		pagination: PagePagination;
+		list: ForumUserDecorationEntity[];
 	}
 
 	interface ForumNotificationPageResponse {
@@ -1513,6 +1801,11 @@ declare namespace Eps {
 	interface ForumPostPageResponse {
 		pagination: PagePagination;
 		list: ForumPostEntity[];
+	}
+
+	interface ForumTipPageResponse {
+		pagination: PagePagination;
+		list: ForumTipEntity[];
 	}
 
 	interface ForumUserPageResponse {
@@ -2374,6 +2667,51 @@ declare namespace Eps {
 		request: Request;
 	}
 
+	interface ForumBounty {
+		/**
+		 * 悬赏人工退款
+		 */
+		refund(data?: any): Promise<any>;
+
+		/**
+		 * 立即结算到期悬赏
+		 */
+		sweep(data?: any): Promise<any>;
+
+		/**
+		 * 分页查询
+		 */
+		page(data?: any): Promise<ForumBountyPageResponse>;
+
+		/**
+		 * 列表查询
+		 */
+		list(data?: any): Promise<ForumBountyEntity[]>;
+
+		/**
+		 * 单个信息
+		 */
+		info(data?: any): Promise<ForumBountyEntity>;
+
+		/**
+		 * 权限标识
+		 */
+		permission: { refund: string; sweep: string; page: string; list: string; info: string };
+
+		/**
+		 * 权限状态
+		 */
+		_permission: {
+			refund: boolean;
+			sweep: boolean;
+			page: boolean;
+			list: boolean;
+			info: boolean;
+		};
+
+		request: Request;
+	}
+
 	interface ForumCategory {
 		/**
 		 * 修改
@@ -2444,19 +2782,110 @@ declare namespace Eps {
 		saveLevels(data?: any): Promise<any>;
 
 		/**
-		 * 读取签到/等级配置
+		 * 保存悬赏配置
+		 */
+		saveBounty(data?: any): Promise<any>;
+
+		/**
+		 * 读取全部配置（签到/等级/商城/打赏/悬赏/道具）
 		 */
 		getConfig(data?: any): Promise<any>;
 
 		/**
+		 * 保存功能道具配置
+		 */
+		saveProps(data?: any): Promise<any>;
+
+		/**
+		 * 保存商城配置
+		 */
+		saveShop(data?: any): Promise<any>;
+
+		/**
+		 * 保存打赏配置
+		 */
+		saveTip(data?: any): Promise<any>;
+
+		/**
+		 * 恢复某组消费配置为默认（删 Redis key）
+		 */
+		reset(data?: any): Promise<any>;
+
+		/**
 		 * 权限标识
 		 */
-		permission: { saveCheckin: string; saveLevels: string; getConfig: string };
+		permission: {
+			saveCheckin: string;
+			saveLevels: string;
+			saveBounty: string;
+			getConfig: string;
+			saveProps: string;
+			saveShop: string;
+			saveTip: string;
+			reset: string;
+		};
 
 		/**
 		 * 权限状态
 		 */
-		_permission: { saveCheckin: boolean; saveLevels: boolean; getConfig: boolean };
+		_permission: {
+			saveCheckin: boolean;
+			saveLevels: boolean;
+			saveBounty: boolean;
+			getConfig: boolean;
+			saveProps: boolean;
+			saveShop: boolean;
+			saveTip: boolean;
+			reset: boolean;
+		};
+
+		request: Request;
+	}
+
+	interface ForumDashboard {
+		/**
+		 * 积分消费看板总览
+		 */
+		getOverview(data?: any): Promise<any>;
+
+		/**
+		 * 权限标识
+		 */
+		permission: { getOverview: string };
+
+		/**
+		 * 权限状态
+		 */
+		_permission: { getOverview: boolean };
+
+		request: Request;
+	}
+
+	interface ForumDecoration {
+		/**
+		 * 分页查询
+		 */
+		page(data?: any): Promise<ForumDecorationPageResponse>;
+
+		/**
+		 * 列表查询
+		 */
+		list(data?: any): Promise<ForumUserDecorationEntity[]>;
+
+		/**
+		 * 单个信息
+		 */
+		info(data?: any): Promise<ForumUserDecorationEntity>;
+
+		/**
+		 * 权限标识
+		 */
+		permission: { page: string; list: string; info: string };
+
+		/**
+		 * 权限状态
+		 */
+		_permission: { page: boolean; list: boolean; info: boolean };
 
 		request: Request;
 	}
@@ -2585,6 +3014,93 @@ declare namespace Eps {
 			deletePost: boolean;
 			togglePin: boolean;
 			comments: boolean;
+			page: boolean;
+			list: boolean;
+			info: boolean;
+		};
+
+		request: Request;
+	}
+
+	interface ForumShopItem {
+		/**
+		 * 读取装饰商品目录
+		 */
+		catalog(data?: any): Promise<any>;
+
+		/**
+		 * 修改
+		 */
+		update(data?: any): Promise<any>;
+
+		/**
+		 * 同步商品目录
+		 */
+		sync(data?: any): Promise<any>;
+
+		/**
+		 * 权限标识
+		 */
+		permission: { catalog: string; update: string; sync: string };
+
+		/**
+		 * 权限状态
+		 */
+		_permission: { catalog: boolean; update: boolean; sync: boolean };
+
+		request: Request;
+	}
+
+	interface ForumTip {
+		/**
+		 * 打赏按接收方聚合
+		 */
+		aggregateByReceiver(data?: any): Promise<any>;
+
+		/**
+		 * 打赏按发送方聚合
+		 */
+		aggregateBySender(data?: any): Promise<any>;
+
+		/**
+		 * 打赏同方同收对预警
+		 */
+		aggregateByPair(data?: any): Promise<any>;
+
+		/**
+		 * 分页查询
+		 */
+		page(data?: any): Promise<ForumTipPageResponse>;
+
+		/**
+		 * 列表查询
+		 */
+		list(data?: any): Promise<ForumTipEntity[]>;
+
+		/**
+		 * 单个信息
+		 */
+		info(data?: any): Promise<ForumTipEntity>;
+
+		/**
+		 * 权限标识
+		 */
+		permission: {
+			aggregateByReceiver: string;
+			aggregateBySender: string;
+			aggregateByPair: string;
+			page: string;
+			list: string;
+			info: string;
+		};
+
+		/**
+		 * 权限状态
+		 */
+		_permission: {
+			aggregateByReceiver: boolean;
+			aggregateBySender: boolean;
+			aggregateByPair: boolean;
 			page: boolean;
 			list: boolean;
 			info: boolean;
@@ -3098,11 +3614,16 @@ declare namespace Eps {
 		forum: {
 			advert: ForumAdvert;
 			announcement: ForumAnnouncement;
+			bounty: ForumBounty;
 			category: ForumCategory;
 			config: ForumConfig;
+			dashboard: ForumDashboard;
+			decoration: ForumDecoration;
 			notification: ForumNotification;
 			pointLog: ForumPointLog;
 			post: ForumPost;
+			shopItem: ForumShopItem;
+			tip: ForumTip;
 			user: ForumUser;
 		};
 		plugin: { info: PluginInfo };

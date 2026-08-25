@@ -1,132 +1,86 @@
 import { Config, Provide } from '@midwayjs/core';
-import { Redis } from 'ioredis';
 import { CoolCommException } from '@cool-midway/core';
+import axios from 'axios';
 
 /**
- * 游戏化配置（签到奖励 / 等级体系）服务。
+ * 游戏化配置（签到奖励 / 等级体系 / 消费体系四组）服务。
  *
- * 由后台控制、直写与 forum server 共用的共享 Redis（db:0）；forum 侧只读 + 校验 + 默认兜底
- * （见 server/src/services/config/config.service.ts 与 server/src/constants/redis-keys.ts）。
- *
- * 用原生 ioredis 而非 cache-manager：cache-manager 的 key 会带前缀/序列化不确定，
- * 这里必须写入与 forum 侧完全一致的裸 key 与 JSON 字符串。
- * Redis 连接参数复用 cacheManager 的 clients.default.options（host/port/password/db）。
+ * 配置契约（Redis key 名 + zod schema + 默认值）只在 forum server 存一份（服务端单一写入口），
+ * 本服务不再直连共享 Redis、不再手抄 key 与校验，统一经 forum server 管理接口读写：
+ *   GET    /api/admin/config           读取 6 组「已解析生效值」（zod 校验 + 默认兜底后）
+ *   PUT    /api/admin/config/:group    写入一组（server 侧按 zod schema 校验，非法回 400）
+ *   DELETE /api/admin/config/:group    删除 Redis key → forum 侧回退代码内置默认值
+ * 服务间带 X-Admin-Key，错误 message 透传（同 service/bounty.ts 的退款转发模式）。
  */
-
-/** 与 forum server 的 RedisKey.configCheckin / configLevels 保持一致 */
-const CONFIG_CHECKIN_KEY = 'config:checkin';
-const CONFIG_LEVELS_KEY = 'config:levels';
-
 @Provide()
 export class ForumGameConfigService {
-  @Config('cacheManager')
-  cacheManagerConfig: any;
+  @Config('forum.serverUrl')
+  forumServerUrl: string;
 
-  private client: Redis | null = null;
+  @Config('forum.adminKey')
+  forumAdminKey: string;
 
-  /** 原生 ioredis 客户端（惰性创建，Singleton 复用） */
-  private get redis(): Redis {
-    if (!this.client) {
-      const opts = this.cacheManagerConfig?.clients?.default?.options ?? {};
-      const client = new Redis({
-        host: opts.host || '127.0.0.1',
-        port: opts.port || 6379,
-        password: opts.password || '',
-        db: opts.db ?? 0,
-        lazyConnect: true,
-      });
-      client.connect().catch((err) =>
-        console.error('[game-config] Redis 连接失败:', (err as Error).message)
-      );
-      this.client = client;
-    }
-    return this.client;
-  }
-
-  /**
-   * 读取当前配置。key 缺失/非法 JSON 返回 null，页面据此展示默认值（forum 侧兜底）。
-   */
-  async getConfig(): Promise<{ checkin: any; levels: any }> {
-    const [checkinRaw, levelsRaw] = await Promise.all([
-      this.redis.get(CONFIG_CHECKIN_KEY),
-      this.redis.get(CONFIG_LEVELS_KEY),
-    ]);
-    return {
-      checkin: this.safeParse(checkinRaw),
-      levels: this.safeParse(levelsRaw),
-    };
-  }
-
-  /** 保存签到奖励配置（校验后直写共享 Redis） */
-  async saveCheckin(cfg: any): Promise<void> {
-    this.assertCheckin(cfg);
-    await this.redis.set(CONFIG_CHECKIN_KEY, JSON.stringify(cfg));
-  }
-
-  /** 保存等级配置（校验后直写共享 Redis） */
-  async saveLevels(levels: any): Promise<void> {
-    this.assertLevels(levels);
-    await this.redis.set(CONFIG_LEVELS_KEY, JSON.stringify(levels));
-  }
-
-  private safeParse(raw: string | null): any {
-    if (!raw) return null;
+  /** 调 forum server 管理接口，统一带服务间密钥并解析响应（同 bounty.ts 的 call 同款）。 */
+  private async call(method: 'get' | 'put' | 'delete', path: string, body?: unknown) {
     try {
-      return JSON.parse(raw);
-    } catch {
-      return null;
+      const { data } = await axios.request({
+        method,
+        url: `${this.forumServerUrl}${path}`,
+        data: body,
+        headers: { 'X-Admin-Key': this.forumAdminKey },
+        timeout: 5000,
+      });
+      if (!data?.success) {
+        throw new CoolCommException(data?.error?.message || 'forum 接口调用失败');
+      }
+      return data.data;
+    } catch (err) {
+      if (err instanceof CoolCommException) throw err;
+      // axios 对非 2xx 抛错，把 forum 返回的业务错误 message 透传出来（zod 校验失败文案等）
+      const message = err?.response?.data?.error?.message;
+      throw new CoolCommException(message || '调用 forum 服务失败，请检查服务是否启动');
     }
   }
 
-  /** 签到配置校验：5 个参数均为整数，milestoneEvery 至少 1 */
-  private assertCheckin(cfg: any): void {
-    const fields: Array<[string, number]> = [
-      ['base', 0],
-      ['streakBonusPerDay', 0],
-      ['streakBonusCap', 0],
-      ['milestoneEvery', 1],
-      ['milestoneBonus', 0],
-    ];
-    for (const [key, min] of fields) {
-      const v = cfg?.[key];
-      if (!Number.isInteger(v) || v < min) {
-        throw new CoolCommException(`签到配置「${key}」必须是不小于 ${min} 的整数`);
-      }
-    }
+  /** 读取当前配置：forum 返回 6 组已解析生效值（checkin/levels/shop/tip/bounty/props），页面据此初始化 */
+  async getConfig(): Promise<any> {
+    return this.call('get', '/api/admin/config');
   }
 
-  /**
-   * 等级配置校验（与 forum 侧 levelsSchema 约束一致）：
-   * 非空、key 唯一、恰好一个 minTotal=0 的起始等级、按门槛严格降序。
-   */
-  private assertLevels(levels: any): void {
-    if (!Array.isArray(levels) || levels.length === 0) {
-      throw new CoolCommException('等级列表不能为空');
-    }
-    const keys = new Set<string>();
-    let baseCount = 0;
-    for (let i = 0; i < levels.length; i++) {
-      const l = levels[i];
-      if (typeof l?.key !== 'string' || !l.key.trim()) {
-        throw new CoolCommException(`第 ${i + 1} 级缺少等级 key`);
-      }
-      if (typeof l?.name !== 'string' || !l.name.trim()) {
-        throw new CoolCommException(`等级「${l.key}」缺少中文名`);
-      }
-      if (!Number.isInteger(l.minTotal) || l.minTotal < 0) {
-        throw new CoolCommException(`等级「${l.key}」的门槛必须是不小于 0 的整数`);
-      }
-      if (keys.has(l.key)) {
-        throw new CoolCommException(`等级 key「${l.key}」重复`);
-      }
-      keys.add(l.key);
-      if (l.minTotal === 0) baseCount++;
-      if (i > 0 && levels[i - 1].minTotal <= l.minTotal) {
-        throw new CoolCommException('等级需按门槛严格降序排列（高的在前）');
-      }
-    }
-    if (baseCount !== 1) {
-      throw new CoolCommException('必须恰好一个门槛为 0 的起始等级');
-    }
+  /** 保存签到奖励配置（forum 侧 zod 校验后落 Redis） */
+  async saveCheckin(cfg: any): Promise<void> {
+    await this.call('put', '/api/admin/config/checkin', cfg);
+  }
+
+  /** 保存等级配置 */
+  async saveLevels(levels: any): Promise<void> {
+    await this.call('put', '/api/admin/config/levels', levels);
+  }
+
+  /** 保存商城配置 */
+  async saveShop(cfg: any): Promise<void> {
+    await this.call('put', '/api/admin/config/shop', cfg);
+  }
+
+  /** 保存打赏配置（档位 / 自定义上下限 / 热度权重等） */
+  async saveTip(cfg: any): Promise<void> {
+    await this.call('put', '/api/admin/config/tip', cfg);
+  }
+
+  /** 保存悬赏配置 */
+  async saveBounty(cfg: any): Promise<void> {
+    await this.call('put', '/api/admin/config/bounty', cfg);
+  }
+
+  /** 保存功能道具配置 */
+  async saveProps(cfg: any): Promise<void> {
+    await this.call('put', '/api/admin/config/props', cfg);
+  }
+
+  /** 恢复某组配置为默认值：删 Redis key，forum 侧自动回退代码内置默认值。body 形如 { group } */
+  async reset(body: any): Promise<void> {
+    const group = typeof body === 'string' ? body : body?.group;
+    if (!group) throw new CoolCommException('缺少配置组 group');
+    await this.call('delete', `/api/admin/config/${group}`);
   }
 }
