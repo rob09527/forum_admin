@@ -30,6 +30,10 @@ import { ForumPointLogEntity } from './modules/forum/entity/pointLog';
 import { ForumCategoryEntity } from './modules/forum/entity/category';
 import { ForumAnnouncementEntity } from './modules/forum/entity/announcement';
 import { ForumAdvertEntity } from './modules/forum/entity/advert';
+import { ForumShopItemEntity } from './modules/forum/entity/shopItem';
+import { ForumUserDecorationEntity } from './modules/forum/entity/userDecoration';
+import { ForumTipEntity } from './modules/forum/entity/tip';
+import { ForumBountyEntity } from './modules/forum/entity/bounty';
 // import * as task from '@cool-midway/task';
 // import * as rpc from '@cool-midway/rpc';
 
@@ -91,6 +95,11 @@ export class MainConfiguration {
     ForumCategoryEntity,
     ForumAnnouncementEntity,
     ForumAdvertEntity,
+    // 积分消费体系（docs/积分消费体系.md 第 4.1 节）：4 张新表，遗漏会导致启动 schema 漂移 fail-fast
+    ForumShopItemEntity,
+    ForumUserDecorationEntity,
+    ForumTipEntity,
+    ForumBountyEntity,
   ];
 
   async onReady() {

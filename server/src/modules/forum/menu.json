@@ -301,6 +301,252 @@
             "keepAlive": true,
             "isShow": true,
             "childMenus": []
+          },
+          {
+            "name": "保存商城配置",
+            "router": null,
+            "perms": "forum:config:saveShop",
+            "type": 2,
+            "icon": null,
+            "orderNum": 4,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          },
+          {
+            "name": "保存打赏配置",
+            "router": null,
+            "perms": "forum:config:saveTip",
+            "type": 2,
+            "icon": null,
+            "orderNum": 5,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          },
+          {
+            "name": "保存悬赏配置",
+            "router": null,
+            "perms": "forum:config:saveBounty",
+            "type": 2,
+            "icon": null,
+            "orderNum": 6,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          },
+          {
+            "name": "保存道具配置",
+            "router": null,
+            "perms": "forum:config:saveProps",
+            "type": 2,
+            "icon": null,
+            "orderNum": 7,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          },
+          {
+            "name": "恢复消费配置默认",
+            "router": null,
+            "perms": "forum:config:reset",
+            "type": 2,
+            "icon": null,
+            "orderNum": 8,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "积分消费",
+    "router": "/points",
+    "perms": null,
+    "type": 0,
+    "icon": "icon-amount",
+    "orderNum": 2,
+    "viewPath": null,
+    "keepAlive": true,
+    "isShow": true,
+    "childMenus": [
+      {
+        "name": "数据看板",
+        "router": "/forum/dashboard",
+        "perms": null,
+        "type": 1,
+        "icon": "icon-chart",
+        "orderNum": 1,
+        "viewPath": "modules/forum/views/dashboard/index.vue",
+        "keepAlive": true,
+        "isShow": true,
+        "childMenus": [
+          {
+            "name": "查看数据看板",
+            "router": null,
+            "perms": "forum:dashboard:getOverview",
+            "type": 2,
+            "icon": null,
+            "orderNum": 1,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          }
+        ]
+      },
+      {
+        "name": "商品管理",
+        "router": "/forum/shop",
+        "perms": null,
+        "type": 1,
+        "icon": "icon-goods",
+        "orderNum": 2,
+        "viewPath": "modules/forum/views/shop/list.vue",
+        "keepAlive": true,
+        "isShow": true,
+        "childMenus": [
+          {
+            "name": "查看商品目录",
+            "router": null,
+            "perms": "forum:shopItem:catalog",
+            "type": 2,
+            "icon": null,
+            "orderNum": 1,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          },
+          {
+            "name": "修改商品",
+            "router": null,
+            "perms": "forum:shopItem:update",
+            "type": 2,
+            "icon": null,
+            "orderNum": 2,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          },
+          {
+            "name": "同步商品",
+            "router": null,
+            "perms": "forum:shopItem:sync",
+            "type": 2,
+            "icon": null,
+            "orderNum": 3,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          }
+        ]
+      },
+      {
+        "name": "持有记录",
+        "router": "/forum/decoration",
+        "perms": null,
+        "type": 1,
+        "icon": "icon-color",
+        "orderNum": 3,
+        "viewPath": "modules/forum/views/decoration/list.vue",
+        "keepAlive": true,
+        "isShow": true,
+        "childMenus": [
+          {
+            "name": "查看持有记录",
+            "router": null,
+            "perms": "forum:decoration:page",
+            "type": 2,
+            "icon": null,
+            "orderNum": 1,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          }
+        ]
+      },
+      {
+        "name": "打赏记录",
+        "router": "/forum/tip",
+        "perms": null,
+        "type": 1,
+        "icon": "icon-red-packet",
+        "orderNum": 4,
+        "viewPath": "modules/forum/views/tip/list.vue",
+        "keepAlive": true,
+        "isShow": true,
+        "childMenus": [
+          {
+            "name": "查看打赏记录",
+            "router": null,
+            "perms": "forum:tip:page",
+            "type": 2,
+            "icon": null,
+            "orderNum": 1,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          }
+        ]
+      },
+      {
+        "name": "悬赏管理",
+        "router": "/forum/bounty",
+        "perms": null,
+        "type": 1,
+        "icon": "icon-amount",
+        "orderNum": 5,
+        "viewPath": "modules/forum/views/bounty/list.vue",
+        "keepAlive": true,
+        "isShow": true,
+        "childMenus": [
+          {
+            "name": "查看悬赏",
+            "router": null,
+            "perms": "forum:bounty:page",
+            "type": 2,
+            "icon": null,
+            "orderNum": 1,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          },
+          {
+            "name": "人工退款",
+            "router": null,
+            "perms": "forum:bounty:refund",
+            "type": 2,
+            "icon": null,
+            "orderNum": 2,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          },
+          {
+            "name": "立即结算到期悬赏",
+            "router": null,
+            "perms": "forum:bounty:sweep",
+            "type": 2,
+            "icon": null,
+            "orderNum": 3,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
           }
         ]
       }
