@@ -11,6 +11,13 @@ permissions:
   packages: write
 
 jobs:
+  # 菜单图标校验：menu.json 引用了不存在的 icon-* 名称会直接失败，避免「图标失效」回归上线
+  check-menu-icons:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: node scripts/check-menu-icons.mjs
+
   build:
     runs-on: ubuntu-latest # amd64，无 QEMU
     strategy:

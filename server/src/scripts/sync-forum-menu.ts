@@ -17,6 +17,10 @@ import { BaseSysMenuEntity } from '../modules/base/entity/sys/menu';
  *
  * 仅 upsert、不删除：后台手工新增/改名过的菜单不会被误删；
  * 若某菜单需从 menu.json 移除，可在后台「系统管理→菜单管理」手动删除。
+ *
+ * 注意：改 menu.json 的 icon 前，先确保图标名对应 client 侧
+ * src/modules/base/static/svg/ 里存在的 icon-*.svg（去掉 .svg 后缀）。
+ * 写错图标名不会报错、只在菜单上不显示；本地可跑 scripts/check-menu-icons.mjs 校验（CI 已接入）。
  */
 interface MenuNode {
   name: string;
