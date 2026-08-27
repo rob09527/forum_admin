@@ -53,7 +53,8 @@
 				<div class="flex items-center justify-between">
 					<span>🐔 等级体系</span>
 					<div>
-						<el-button size="small" @click="addLevel">添加等级</el-button>
+						<el-button size="small" :disabled="levels.length >= levelPool.length" @click="activateNextLevel">+1 档</el-button>
+						<el-button size="small" :disabled="levels.length <= 1" @click="deactivateTopLevel">-1 档</el-button>
 						<el-button type="primary" size="small" :loading="savingLevels" @click="saveLevels">
 							保存等级配置
 						</el-button>
@@ -63,7 +64,7 @@
 			<el-table :data="levels" border size="small">
 				<el-table-column label="等级标识 (key)" min-width="170">
 					<template #default="{ row }">
-						<el-input v-model="row.key" placeholder="如 claw" />
+						<span class="font-mono text-xs text-zinc-500">{{ row.key }}</span>
 					</template>
 				</el-table-column>
 				<el-table-column label="中文名" min-width="140">
@@ -76,15 +77,10 @@
 						<el-input-number v-model="row.minTotal" :min="0" :step="1" />
 					</template>
 				</el-table-column>
-				<el-table-column label="操作" width="90" align="center">
-					<template #default="{ $index }">
-						<el-button type="danger" link @click="removeLevel($index)">删除</el-button>
-					</template>
-				</el-table-column>
 			</el-table>
 			<div class="form-tip mt-2">
-				规则：key 唯一且非空；必须恰好一个门槛为 0 的起始等级；保存时自动按门槛降序。
-				未配置时论坛端使用默认值（基础分 5 / 连签加成 1 / 上限 5 / 里程碑 7 天 +30；鸡爪≥0 / 鸡腿≥100 / 鸡肉≥500）。
+				规则：key 固定预生成、不可改；名字与门槛可编辑（门槛需严格递增：高档 > 低档）。
+				通过「+1 档 / -1 档」在 10 档内增减激活数量（不可跳档）。保存后论坛端按新门槛重算存量用户等级。
 			</div>
 		</el-card>
 
@@ -324,12 +320,22 @@ const DEFAULT_CHECKIN = {
 	milestoneBonus: 30
 };
 
-/** 默认等级（与 forum server 的 DEFAULT_LEVELS 保持一致） */
-const DEFAULT_LEVELS = [
+/** 等级预置池（与 forum server 的 LEVEL_POOL 一致）：key 固定、名字/门槛为占位默认值 */
+const LEVEL_POOL = [
+	{ key: 'mythic', name: '神兽', minTotal: 64000 },
+	{ key: 'divine', name: '神鸟', minTotal: 32000 },
+	{ key: 'phoenix', name: '凤凰', minTotal: 16000 },
+	{ key: 'pheasant', name: '山鸡', minTotal: 8000 },
+	{ key: 'free', name: '走地鸡', minTotal: 4000 },
+	{ key: 'whole', name: '整鸡', minTotal: 2000 },
+	{ key: 'wing', name: '鸡翅', minTotal: 1000 },
 	{ key: 'meat', name: '鸡肉', minTotal: 500 },
 	{ key: 'leg', name: '鸡腿', minTotal: 100 },
 	{ key: 'claw', name: '鸡爪', minTotal: 0 }
 ];
+
+/** 默认激活等级（池末尾 3 档，与 forum server 的 DEFAULT_LEVELS 一致） */
+const DEFAULT_LEVELS = LEVEL_POOL.slice(-3);
 
 /** 默认商城配置（与 forum server 的 DEFAULT_SHOP_CONFIG 一致） */
 const DEFAULT_SHOP = { defaultDurationDays: 30, remindDays: 3 };
@@ -370,6 +376,8 @@ const MB = 1024 * 1024;
 
 const checkin = reactive({ ...DEFAULT_CHECKIN });
 const levels = ref<{ key: string; name: string; minTotal: number }[]>(DEFAULT_LEVELS.map((l) => ({ ...l })));
+/** 预置池（10 档，key 固定；优先用 server 返回，本地常量作兜底） */
+const levelPool = ref<{ key: string; name: string; minTotal: number }[]>(LEVEL_POOL.map((l) => ({ ...l })));
 
 const shop = reactive({ ...DEFAULT_SHOP });
 const tip = reactive({ ...DEFAULT_TIP, _noLimit: true });
@@ -389,6 +397,9 @@ onMounted(async () => {
 		if (data?.checkin) Object.assign(checkin, data.checkin);
 		if (Array.isArray(data?.levels) && data.levels.length) {
 			levels.value = data.levels.map((l: any) => ({ key: l.key, name: l.name, minTotal: l.minTotal }));
+		}
+		if (Array.isArray(data?.levelPool) && data.levelPool.length) {
+			levelPool.value = data.levelPool.map((l: any) => ({ key: l.key, name: l.name, minTotal: l.minTotal }));
 		}
 		// 消费体系四组（缺省用默认值；Redis 非法数据返回 null 也回退默认，与论坛端兜底一致）
 		if (data?.shop) Object.assign(shop, data.shop);
@@ -432,10 +443,8 @@ async function saveCheckin() {
 async function saveLevels() {
 	savingLevels.value = true;
 	try {
-		// 发送前按门槛降序（高的在前），与论坛端校验一致
-		const sorted = [...levels.value].sort((a, b) => b.minTotal - a.minTotal);
-		await service.forum.config.saveLevels(sorted);
-		levels.value = sorted;
+		// key 顺序由预置池固定，不重排；门槛严格降序由后端校验（非法即 400 提示）
+		await service.forum.config.saveLevels(levels.value.map((l) => ({ ...l })));
 		ElMessage.success('等级配置已保存');
 	} catch (err: any) {
 		// 后端业务错误（如校验不通过）由请求层静默 reject，这里统一提示
@@ -446,12 +455,18 @@ async function saveLevels() {
 	}
 }
 
-function addLevel() {
-	levels.value.push({ key: '', name: '', minTotal: 0 });
+/** 激活上一档（+1 档）：追加预置池中紧邻当前最高档之上的一档；不可跳档 */
+function activateNextLevel() {
+	if (levels.value.length >= levelPool.value.length) return;
+	const next = levelPool.value[levelPool.value.length - levels.value.length - 1];
+	if (!next) return;
+	levels.value = [{ key: next.key, name: next.name, minTotal: next.minTotal }, ...levels.value];
 }
 
-function removeLevel(index: number) {
-	levels.value.splice(index, 1);
+/** 取消最高档（-1 档）：移除当前降序列表最前（最高档） */
+function deactivateTopLevel() {
+	if (levels.value.length <= 1) return;
+	levels.value = levels.value.slice(1);
 }
 
 // ── 消费体系四组：保存（直写共享 Redis，forum 侧只读 + 校验） ──
