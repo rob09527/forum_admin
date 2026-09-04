@@ -210,18 +210,21 @@ async function doReimport() {
 }
 
 async function doReindex() {
-	await ElMessageBox.confirm('全量重建搜索索引，上万帖时耗时较长（几十秒）。确定执行？', '重建索引', {
-		type: 'warning',
-		confirmButtonText: '重建',
-		cancelButtonText: '取消'
-	});
+	try {
+		await ElMessageBox.confirm('全量重建搜索索引，上万帖时耗时较长（几十秒）。确定执行？', '重建索引', {
+			type: 'warning',
+			confirmButtonText: '重建',
+			cancelButtonText: '取消'
+		});
+	} catch {
+		return; // 用户取消
+	}
 	reindexing.value = true;
 	try {
 		const res: any = await service.forum.nodeloc.reindex();
 		reindexResult.value = res?.count ?? 0;
 		ElMessage.success(`重建完成，写入 ${fmt(reindexResult.value)} 篇`);
 	} catch (err: any) {
-		if (err === 'cancel' || err === 'close') return;
 		showError(err, '重建失败');
 	} finally {
 		reindexing.value = false;
