@@ -34,6 +34,8 @@ import { ForumShopItemEntity } from './modules/forum/entity/shopItem';
 import { ForumUserDecorationEntity } from './modules/forum/entity/userDecoration';
 import { ForumTipEntity } from './modules/forum/entity/tip';
 import { ForumBountyEntity } from './modules/forum/entity/bounty';
+import { ForumNotificationEntity } from './modules/forum/entity/notification';
+import { ForumNotificationMessageEntity } from './modules/forum/entity/notification-message';
 // import * as task from '@cool-midway/task';
 // import * as rpc from '@cool-midway/rpc';
 
@@ -100,6 +102,10 @@ export class MainConfiguration {
     ForumUserDecorationEntity,
     ForumTipEntity,
     ForumBountyEntity,
+    // 通知体系 2 张表：此前漏登记，导致 forum server 改这两张表结构时 admin 启动自检发现不了漂移
+    // （TypeORM 仍会加载它们，见 src/entities.ts，所以运行时会真的报「列不存在」）
+    ForumNotificationEntity,
+    ForumNotificationMessageEntity,
   ];
 
   async onReady() {

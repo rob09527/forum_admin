@@ -351,6 +351,18 @@
             "childMenus": []
           },
           {
+            "name": "保存限制配置",
+            "router": null,
+            "perms": "forum:config:saveLimits",
+            "type": 2,
+            "icon": null,
+            "orderNum": 8,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          },
+          {
             "name": "恢复消费配置默认",
             "router": null,
             "perms": "forum:config:reset",

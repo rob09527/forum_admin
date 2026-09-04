@@ -112,7 +112,8 @@ const Table = useTable({
 		},
 		{
 			label: t('接收者'),
-			prop: 'username',
+			// 后端用别名 b.username as "userName"，避免与 notifications 表的列同名碰撞
+			prop: 'userName',
 			minWidth: 120
 		},
 		{

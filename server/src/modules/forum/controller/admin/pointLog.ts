@@ -41,27 +41,16 @@ const timeRangeWhere = (ctx: any) => {
 
 /**
  * 论坛积分明细（只读）。
- * 纯读直连 PG，无自定义写操作，故无需自定义 service，框架用 BaseService 生成 page/list/info。
+ * 纯读直连 PG，无自定义写操作，故无需自定义 service，框架用 BaseService 生成 page/info。
+ *
+ * 不开放 `list`：框架的 list() 不加任何 LIMIT，point_logs 是随业务线性增长的大表，
+ * 一次全量返回会打挂单进程的 Midway。前端 view 走 page + cl-pagination，不依赖 list。
  */
 @Provide()
 @CoolController({
-  api: ['page', 'list', 'info'],
+  api: ['page', 'info'],
   entity: ForumPointLogEntity,
   pageQueryOp: {
-    select: LIST_COLUMNS,
-    keyWordLikeFields: ['b.username'],
-    fieldEq: ['id', 'type'],
-    where: timeRangeWhere,
-    join: [
-      {
-        entity: ForumUserEntity,
-        alias: 'b',
-        condition: 'a.userId = b.id',
-      },
-    ],
-    addOrderBy: { createdAt: 'DESC' },
-  },
-  listQueryOp: {
     select: LIST_COLUMNS,
     keyWordLikeFields: ['b.username'],
     fieldEq: ['id', 'type'],

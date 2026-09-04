@@ -237,7 +237,22 @@
 			</el-form>
 		</el-card>
 
-		<!-- 功能道具配置 -->
+		<!-- 频率与体积限制 -->
+			<el-card v-permission="service.forum.config.permission.saveLimits" class="mt-3" shadow="never">
+				<template #header><div class="flex items-center justify-between"><span>🛡️ 频率与体积限制</span><div><el-button size="small" v-permission="service.forum.config.permission.reset" @click="resetGroup('limits')">恢复默认</el-button><el-button type="primary" size="small" :loading="savingLimits" @click="saveLimits">保存限制配置</el-button></div></div></template>
+				<el-form label-width="190px" label-position="left"><el-row :gutter="24">
+					<el-col :xs="24" :md="12"><el-form-item label="单文件上限（MB）"><el-input-number v-model="limits.uploadMaxFileSizeMb" :min="1" :max="100" :step="1" /><div class="form-tip">调大后需重启 forum server 才能扩大解析器上限</div></el-form-item></el-col>
+					<el-col :xs="24" :md="12"><el-form-item label="用户总配额（MB）"><el-input-number v-model="limits.uploadMaxUserTotalSizeMb" :min="10" :max="10240" :step="10" /></el-form-item></el-col>
+					<el-col :xs="24" :md="12"><el-form-item label="上传次数（次/分钟）"><el-input-number v-model="limits.uploadMaxPerMinute" :min="1" :max="600" :step="1" /></el-form-item></el-col>
+					<el-col :xs="24" :md="12"><el-form-item label="接口限流（次/分/IP）"><el-input-number v-model="limits.apiRatePerMinute" :min="30" :max="100000" :step="100" /></el-form-item></el-col>
+					<el-col :xs="24" :md="12"><el-form-item label="头像拉取（次/分/IP）"><el-input-number v-model="limits.avatarFetchPerMinute" :min="60" :max="200000" :step="100" /><div class="form-tip">/uploads/avatars/ 独立桶，默认 4800</div></el-form-item></el-col>
+					<el-col :xs="24" :md="12"><el-form-item label="普通图片（次/分/IP）"><el-input-number v-model="limits.imageFetchPerMinute" :min="30" :max="100000" :step="100" /></el-form-item></el-col>
+					<el-col :xs="24" :md="12"><el-form-item label="私信长度（字符）"><el-input-number v-model="limits.dmContentMaxLength" :min="1" :max="20000" :step="100" /></el-form-item></el-col>
+					<el-col :xs="24" :md="12"><el-form-item label="私信频率（条/分钟）"><el-input-number v-model="limits.dmMaxPerMinute" :min="1" :max="600" :step="1" /></el-form-item></el-col>
+				</el-row></el-form>
+			</el-card>
+
+			<!-- 功能道具配置 -->
 		<el-card v-permission="service.forum.config.permission.saveProps" class="mt-3" shadow="never">
 			<template #header>
 				<div class="flex items-center justify-between">
@@ -372,6 +387,18 @@ const DEFAULT_PROPS = {
 	quotaTotalLimitMb: 500
 };
 
+/** 默认限制配置（字节字段以 MB 展示，需与 forum server 的默认值保持一致） */
+const DEFAULT_LIMITS = {
+	uploadMaxFileSizeMb: 10,
+	uploadMaxUserTotalSizeMb: 50,
+	uploadMaxPerMinute: 20,
+	apiRatePerMinute: 600,
+	avatarFetchPerMinute: 4800,
+	imageFetchPerMinute: 1200,
+	dmContentMaxLength: 2000,
+	dmMaxPerMinute: 30
+};
+
 const MB = 1024 * 1024;
 
 const checkin = reactive({ ...DEFAULT_CHECKIN });
@@ -383,6 +410,7 @@ const shop = reactive({ ...DEFAULT_SHOP });
 const tip = reactive({ ...DEFAULT_TIP, _noLimit: true });
 const bounty = reactive({ ...DEFAULT_BOUNTY });
 const props = reactive({ ...DEFAULT_PROPS });
+const limits = reactive({ ...DEFAULT_LIMITS });
 
 const savingCheckin = ref(false);
 const savingLevels = ref(false);
@@ -390,6 +418,7 @@ const savingShop = ref(false);
 const savingTip = ref(false);
 const savingBounty = ref(false);
 const savingProps = ref(false);
+const savingLimits = ref(false);
 
 onMounted(async () => {
 	try {
@@ -418,6 +447,18 @@ onMounted(async () => {
 				quotaPerPurchaseMb: Math.round(data.props.quotaPerPurchase / MB),
 				quotaPrice: data.props.quotaPrice,
 				quotaTotalLimitMb: Math.round(data.props.quotaTotalLimit / MB)
+			});
+		}
+		if (data?.limits) {
+			Object.assign(limits, {
+				uploadMaxFileSizeMb: Math.round(data.limits.uploadMaxFileSize / MB),
+				uploadMaxUserTotalSizeMb: Math.round(data.limits.uploadMaxUserTotalSize / MB),
+				uploadMaxPerMinute: data.limits.uploadMaxPerMinute,
+				apiRatePerMinute: data.limits.apiRatePerMinute,
+				avatarFetchPerMinute: data.limits.avatarFetchPerMinute,
+				imageFetchPerMinute: data.limits.imageFetchPerMinute,
+				dmContentMaxLength: data.limits.dmContentMaxLength,
+				dmMaxPerMinute: data.limits.dmMaxPerMinute
 			});
 		}
 	} catch (err) {
@@ -514,6 +555,24 @@ async function saveBounty() {
 	}
 }
 
+
+async function saveLimits() {
+	savingLimits.value = true;
+	try {
+		await service.forum.config.saveLimits({
+			uploadMaxFileSize: limits.uploadMaxFileSizeMb * MB,
+			uploadMaxUserTotalSize: limits.uploadMaxUserTotalSizeMb * MB,
+			uploadMaxPerMinute: limits.uploadMaxPerMinute,
+			apiRatePerMinute: limits.apiRatePerMinute,
+			avatarFetchPerMinute: limits.avatarFetchPerMinute,
+			imageFetchPerMinute: limits.imageFetchPerMinute,
+			dmContentMaxLength: limits.dmContentMaxLength,
+			dmMaxPerMinute: limits.dmMaxPerMinute
+		});
+		ElMessage.success('限制配置已保存');
+	} catch (err: any) { showError(err, '保存失败'); } finally { savingLimits.value = false; }
+}
+
 async function saveProps() {
 	// 配额字段 MB → 字节（与 forum 侧 schema 一致）
 	savingProps.value = true;
@@ -536,18 +595,19 @@ async function saveProps() {
 }
 
 // 恢复默认：删除 Redis key，forum 侧自动回退代码内置默认值
-async function resetGroup(group: 'shop' | 'tip' | 'bounty' | 'props') {
-	await ElMessageBox.confirm(`确定将${group === 'shop' ? '商城' : group === 'tip' ? '打赏' : group === 'bounty' ? '悬赏' : '道具'}配置恢复为默认值？`, '恢复默认', {
+async function resetGroup(group: 'shop' | 'tip' | 'bounty' | 'props' | 'limits') {
+	await ElMessageBox.confirm(`确定将${group === 'shop' ? '商城' : group === 'tip' ? '打赏' : group === 'bounty' ? '悬赏' : group === 'limits' ? '限制' : '道具'}配置恢复为默认值？`, '恢复默认', {
 		type: 'warning',
 		confirmButtonText: '恢复',
 		cancelButtonText: '取消'
 	});
 	try {
 		await service.forum.config.reset({ group });
-		const defaults = { shop: DEFAULT_SHOP, tip: DEFAULT_TIP, bounty: DEFAULT_BOUNTY, props: DEFAULT_PROPS }[group];
+		const defaults = { shop: DEFAULT_SHOP, tip: DEFAULT_TIP, bounty: DEFAULT_BOUNTY, props: DEFAULT_PROPS, limits: DEFAULT_LIMITS }[group];
 		if (group === 'tip') Object.assign(tip, defaults, { _noLimit: true });
 		else if (group === 'props') Object.assign(props, defaults);
 		else if (group === 'shop') Object.assign(shop, defaults);
+		else if (group === 'limits') Object.assign(limits, defaults);
 		else Object.assign(bounty, defaults);
 		ElMessage.success('已恢复默认');
 	} catch (err: any) {

@@ -864,6 +864,11 @@ declare namespace Eps {
 		createdAt?: timestamp;
 
 		/**
+		 * 用户名
+		 */
+		userName?: string;
+
+		/**
 		 * 任意键值
 		 */
 		[key: string]: any;
@@ -1217,6 +1222,11 @@ declare namespace Eps {
 		 * 上次签到时间
 		 */
 		lastCheckinAt?: timestamp;
+
+		/**
+		 * 是否导入生成的影子用户
+		 */
+		isShadow?: boolean;
 
 		/**
 		 * 注册时间
@@ -2684,11 +2694,6 @@ declare namespace Eps {
 		page(data?: any): Promise<ForumBountyPageResponse>;
 
 		/**
-		 * 列表查询
-		 */
-		list(data?: any): Promise<ForumBountyEntity[]>;
-
-		/**
 		 * 单个信息
 		 */
 		info(data?: any): Promise<ForumBountyEntity>;
@@ -2696,18 +2701,12 @@ declare namespace Eps {
 		/**
 		 * 权限标识
 		 */
-		permission: { refund: string; sweep: string; page: string; list: string; info: string };
+		permission: { refund: string; sweep: string; page: string; info: string };
 
 		/**
 		 * 权限状态
 		 */
-		_permission: {
-			refund: boolean;
-			sweep: boolean;
-			page: boolean;
-			list: boolean;
-			info: boolean;
-		};
+		_permission: { refund: boolean; sweep: boolean; page: boolean; info: boolean };
 
 		request: Request;
 	}
@@ -2787,7 +2786,12 @@ declare namespace Eps {
 		saveBounty(data?: any): Promise<any>;
 
 		/**
-		 * 读取全部配置（签到/等级/商城/打赏/悬赏/道具）
+		 * 保存频率/体积限制配置
+		 */
+		saveLimits(data?: any): Promise<any>;
+
+		/**
+		 * 读取全部配置（签到/等级/商城/打赏/悬赏/道具/限流）
 		 */
 		getConfig(data?: any): Promise<any>;
 
@@ -2818,6 +2822,7 @@ declare namespace Eps {
 			saveCheckin: string;
 			saveLevels: string;
 			saveBounty: string;
+			saveLimits: string;
 			getConfig: string;
 			saveProps: string;
 			saveShop: string;
@@ -2832,6 +2837,7 @@ declare namespace Eps {
 			saveCheckin: boolean;
 			saveLevels: boolean;
 			saveBounty: boolean;
+			saveLimits: boolean;
 			getConfig: boolean;
 			saveProps: boolean;
 			saveShop: boolean;
@@ -2868,11 +2874,6 @@ declare namespace Eps {
 		page(data?: any): Promise<ForumDecorationPageResponse>;
 
 		/**
-		 * 列表查询
-		 */
-		list(data?: any): Promise<ForumUserDecorationEntity[]>;
-
-		/**
 		 * 单个信息
 		 */
 		info(data?: any): Promise<ForumUserDecorationEntity>;
@@ -2880,12 +2881,12 @@ declare namespace Eps {
 		/**
 		 * 权限标识
 		 */
-		permission: { page: string; list: string; info: string };
+		permission: { page: string; info: string };
 
 		/**
 		 * 权限状态
 		 */
-		_permission: { page: boolean; list: boolean; info: boolean };
+		_permission: { page: boolean; info: boolean };
 
 		request: Request;
 	}
@@ -2907,11 +2908,6 @@ declare namespace Eps {
 		page(data?: any): Promise<ForumNotificationPageResponse>;
 
 		/**
-		 * 列表查询
-		 */
-		list(data?: any): Promise<ForumNotificationEntity[]>;
-
-		/**
 		 * 单个信息
 		 */
 		info(data?: any): Promise<ForumNotificationEntity>;
@@ -2919,18 +2915,12 @@ declare namespace Eps {
 		/**
 		 * 权限标识
 		 */
-		permission: { broadcast: string; delete: string; page: string; list: string; info: string };
+		permission: { broadcast: string; delete: string; page: string; info: string };
 
 		/**
 		 * 权限状态
 		 */
-		_permission: {
-			broadcast: boolean;
-			delete: boolean;
-			page: boolean;
-			list: boolean;
-			info: boolean;
-		};
+		_permission: { broadcast: boolean; delete: boolean; page: boolean; info: boolean };
 
 		request: Request;
 	}
@@ -2942,11 +2932,6 @@ declare namespace Eps {
 		page(data?: any): Promise<ForumPointLogPageResponse>;
 
 		/**
-		 * 列表查询
-		 */
-		list(data?: any): Promise<ForumPointLogEntity[]>;
-
-		/**
 		 * 单个信息
 		 */
 		info(data?: any): Promise<ForumPointLogEntity>;
@@ -2954,12 +2939,12 @@ declare namespace Eps {
 		/**
 		 * 权限标识
 		 */
-		permission: { page: string; list: string; info: string };
+		permission: { page: string; info: string };
 
 		/**
 		 * 权限状态
 		 */
-		_permission: { page: boolean; list: boolean; info: boolean };
+		_permission: { page: boolean; info: boolean };
 
 		request: Request;
 	}
@@ -2986,11 +2971,6 @@ declare namespace Eps {
 		page(data?: any): Promise<ForumPostPageResponse>;
 
 		/**
-		 * 列表查询
-		 */
-		list(data?: any): Promise<ForumPostEntity[]>;
-
-		/**
 		 * 单个信息
 		 */
 		info(data?: any): Promise<ForumPostEntity>;
@@ -3003,7 +2983,6 @@ declare namespace Eps {
 			togglePin: string;
 			comments: string;
 			page: string;
-			list: string;
 			info: string;
 		};
 
@@ -3015,7 +2994,6 @@ declare namespace Eps {
 			togglePin: boolean;
 			comments: boolean;
 			page: boolean;
-			list: boolean;
 			info: boolean;
 		};
 
@@ -3073,11 +3051,6 @@ declare namespace Eps {
 		page(data?: any): Promise<ForumTipPageResponse>;
 
 		/**
-		 * 列表查询
-		 */
-		list(data?: any): Promise<ForumTipEntity[]>;
-
-		/**
 		 * 单个信息
 		 */
 		info(data?: any): Promise<ForumTipEntity>;
@@ -3090,7 +3063,6 @@ declare namespace Eps {
 			aggregateBySender: string;
 			aggregateByPair: string;
 			page: string;
-			list: string;
 			info: string;
 		};
 
@@ -3102,7 +3074,6 @@ declare namespace Eps {
 			aggregateBySender: boolean;
 			aggregateByPair: boolean;
 			page: boolean;
-			list: boolean;
 			info: boolean;
 		};
 
@@ -3136,11 +3107,6 @@ declare namespace Eps {
 		page(data?: any): Promise<ForumUserPageResponse>;
 
 		/**
-		 * 列表查询
-		 */
-		list(data?: any): Promise<ForumUserEntity[]>;
-
-		/**
 		 * 单个信息
 		 */
 		info(data?: any): Promise<ForumUserEntity>;
@@ -3154,7 +3120,6 @@ declare namespace Eps {
 			adjustPoints: string;
 			changeRole: string;
 			page: string;
-			list: string;
 			info: string;
 		};
 
@@ -3167,7 +3132,6 @@ declare namespace Eps {
 			adjustPoints: boolean;
 			changeRole: boolean;
 			page: boolean;
-			list: boolean;
 			info: boolean;
 		};
 

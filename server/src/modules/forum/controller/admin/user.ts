@@ -6,7 +6,7 @@ import { ForumUserService } from '../../service/user';
 
 /**
  * 论坛用户管理的列表/详情字段白名单。
- * 框架的 page/list 走原生 SQL `SELECT a.*`，会连实体未映射的列一起返回，
+ * 框架的 page 走原生 SQL `SELECT a.*`，会连实体未映射的列一起返回，
  * 所以必须显式 select 白名单，确保 passwordHash/oauthId 永不外泄。
  */
 const SAFE_COLUMNS = [
@@ -20,8 +20,13 @@ const SAFE_COLUMNS = [
   'a.stars',
   'a.postCount',
   'a.commentCount',
+  // 冗余计数列，前端「关注 / 粉丝」两列依赖，此前漏列导致两列永远为空
+  'a.followerCount',
+  'a.followingCount',
   'a.role',
   'a.status',
+  // 来源标记：导入的影子用户 vs 真人注册，前端「来源」列与筛选依赖
+  'a.isShadow',
   'a.oauthProvider',
   'a.emailVerified',
   'a.uploadSize',
@@ -34,24 +39,42 @@ const SAFE_COLUMNS = [
 ];
 
 /**
+ * 来源筛选（真人注册 / 导入影子用户）。
+ *
+ * 刻意不用框架的 `fieldEq`：它的取值判断是 `if (query[key] || query[key] == 0)`，
+ * 而 `'' == 0` 在 JS 里为 true —— 前端清空下拉传空串时会把 `''` 当有效值绑进 SQL，
+ * boolean 列拿到 `''` 会直接 PG 报错。这里显式只认 true/false 两种取值。
+ *
+ * 请求参数 `isShadow`：布尔或 'true'/'false' 字符串；其余（含空串/未传）视为「全部」不加条件。
+ */
+const shadowWhere = (ctx: any) => {
+  const raw = ctx?.request?.body?.isShadow;
+  const wheres: [string, object][] = [];
+  if (raw === true || raw === 'true') {
+    wheres.push(['a."isShadow" = true', {}]);
+  } else if (raw === false || raw === 'false') {
+    wheres.push(['a."isShadow" = false', {}]);
+  }
+  return wheres;
+};
+
+/**
  * 论坛用户管理。
- * 读走 Cool 框架自动生成的 page/list/info；写转发 forum server。
+ * 读走 Cool 框架自动生成的 page/info；写转发 forum server。
+ *
+ * 不开放 `list`：框架的 list() 不加任何 LIMIT，users 是随业务线性增长的大表，
+ * 一次全量返回会打挂单进程的 Midway。前端 view 走 page + cl-pagination，不依赖 list。
  */
 @Provide()
 @CoolController({
-  api: ['page', 'list', 'info'],
+  api: ['page', 'info'],
   entity: ForumUserEntity,
   service: ForumUserService,
   pageQueryOp: {
     select: SAFE_COLUMNS,
     keyWordLikeFields: ['username', 'email'],
     fieldEq: ['role', 'level', 'status'],
-    addOrderBy: { createdAt: 'DESC' },
-  },
-  listQueryOp: {
-    select: SAFE_COLUMNS,
-    keyWordLikeFields: ['username', 'email'],
-    fieldEq: ['role', 'level', 'status'],
+    where: shadowWhere,
     addOrderBy: { createdAt: 'DESC' },
   },
 })

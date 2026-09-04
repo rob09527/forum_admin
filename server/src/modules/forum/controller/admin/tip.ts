@@ -9,10 +9,13 @@ import { ForumTipService } from '../../service/tip';
  * 记录列表 LEFT JOIN users 取打赏者 / 接收者用户名，支持时间范围、金额区间、目标类型筛选；
  * 三种聚合（按发送方 / 按接收方 / 同方同收对）是排查小号搬运与异常流动的第一入口。
  * 打赏是零和流转，聚合只展示流动方向，不进「发行 vs 回收」口径。
+ *
+ * 不开放 `list`：框架的 list() 不加任何 LIMIT，tips 是随业务线性增长的大表，
+ * 一次全量返回会打挂单进程的 Midway。前端 view 走 page + cl-pagination，不依赖 list。
  */
 @Provide()
 @CoolController({
-  api: ['page', 'list', 'info'],
+  api: ['page', 'info'],
   entity: ForumTipEntity,
   service: ForumTipService,
   pageQueryOp: {
@@ -32,53 +35,6 @@ import { ForumTipService } from '../../service/tip';
     // 关键字模糊搜索（cl-search-key：打赏者 / 接收者用户名）
     keyWordLikeFields: ['c.username', 'd.username'],
     // 时间范围 + 金额区间过滤（cl-search 的 datetimeRange/inputRange hook 拆分请求参数）
-    where: (ctx: any) => {
-      const { startCreatedAt, endCreatedAt, minAmount, maxAmount } = ctx?.request?.body || {};
-      const wheres: [string, object][] = [];
-      if (startCreatedAt) {
-        wheres.push(['a."createdAt" >= :startCreatedAt::timestamp', { startCreatedAt }]);
-      }
-      if (endCreatedAt) {
-        wheres.push(['a."createdAt" <= :endCreatedAt::timestamp', { endCreatedAt }]);
-      }
-      if (minAmount) {
-        wheres.push(['a.amount >= :minAmount', { minAmount: Number(minAmount) }]);
-      }
-      if (maxAmount) {
-        wheres.push(['a.amount <= :maxAmount', { maxAmount: Number(maxAmount) }]);
-      }
-      return wheres;
-    },
-    join: [
-      {
-        entity: ForumUserEntity,
-        alias: 'c',
-        condition: 'a.fromUserId = c.id',
-      },
-      {
-        entity: ForumUserEntity,
-        alias: 'd',
-        condition: 'a.toUserId = d.id',
-      },
-    ],
-    addOrderBy: { createdAt: 'DESC' },
-  },
-  listQueryOp: {
-    select: [
-      'a.id',
-      'a.fromUserId',
-      'a.toUserId',
-      'a.targetType',
-      'a.targetId',
-      'a.amount',
-      'a.message',
-      'a.createdAt',
-      'c.username as "fromUserName"',
-      'd.username as "toUserName"',
-    ],
-    fieldEq: ['a.fromUserId', 'a.toUserId', 'a.targetType'],
-    // 关键字模糊搜索（cl-search-key：打赏者 / 接收者用户名）
-    keyWordLikeFields: ['c.username', 'd.username'],
     where: (ctx: any) => {
       const { startCreatedAt, endCreatedAt, minAmount, maxAmount } = ctx?.request?.body || {};
       const wheres: [string, object][] = [];

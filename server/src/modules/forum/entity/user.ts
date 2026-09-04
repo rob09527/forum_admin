@@ -77,6 +77,16 @@ export class ForumUserEntity extends CoolBaseEntity {
   @Column({ type: 'timestamp', comment: '上次签到时间', nullable: true })
   lastCheckinAt: Date;
 
+  /**
+   * 是否为「影子用户」（外站历史数据导入时代建的占位账号，非真人注册）。
+   * 取值：true=导入生成 / false=真人注册；默认 false。
+   * 由 forum server 的导入流程写入，后台只读。
+   * 存在的理由：导入后影子用户量级(约 3 万)远大于真人(几百)，而 Cool Admin 的关键字
+   * 搜索只有 like，没有 NOT LIKE，无法反向排除；必须有这一列才能筛出真人。
+   */
+  @Column({ type: 'boolean', comment: '是否导入生成的影子用户', default: false })
+  isShadow: boolean;
+
   @Column({ type: 'timestamp', comment: '注册时间' })
   createdAt: Date;
 

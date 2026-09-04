@@ -9,10 +9,13 @@ import { ForumBountyService } from '../../service/bounty';
  * 悬赏管理（积分消费体系 2.4）。
  * 列表只读（状态筛选 + 发起人/被采纳者用户名）；
  * 人工退款 / 立即结算转发 forum server（账务写唯一入口）。
+ *
+ * 不开放 `list`：框架的 list() 不加任何 LIMIT，bounties 是随业务线性增长的大表，
+ * 一次全量返回会打挂单进程的 Midway。前端 view 走 page + cl-pagination，不依赖 list。
  */
 @Provide()
 @CoolController({
-  api: ['page', 'list', 'info'],
+  api: ['page', 'info'],
   entity: ForumBountyEntity,
   service: ForumBountyService,
   pageQueryOp: {
@@ -36,50 +39,6 @@ import { ForumBountyService } from '../../service/bounty';
     ],
     fieldEq: ['a.status', 'a.userId'],
     // 状态 + 时间范围过滤
-    where: (ctx: any) => {
-      const { startCreatedAt, endCreatedAt } = ctx?.request?.body || {};
-      const wheres: [string, object][] = [];
-      if (startCreatedAt) {
-        wheres.push(['a."createdAt" >= :startCreatedAt::timestamp', { startCreatedAt }]);
-      }
-      if (endCreatedAt) {
-        wheres.push(['a."createdAt" <= :endCreatedAt::timestamp', { endCreatedAt }]);
-      }
-      return wheres;
-    },
-    join: [
-      {
-        entity: ForumUserEntity,
-        alias: 'b',
-        condition: 'a.userId = b.id',
-      },
-      {
-        entity: ForumUserEntity,
-        alias: 'c',
-        condition: 'a.acceptedUserId = c.id',
-      },
-    ],
-    addOrderBy: { createdAt: 'DESC' },
-  },
-  listQueryOp: {
-    select: [
-      'a.id',
-      'a.postId',
-      'a.userId',
-      'a.amount',
-      'a.status',
-      'a.expireAt',
-      'a.acceptedCommentId',
-      'a.acceptedUserId',
-      'a.payout',
-      'a.fee',
-      'a.settleType',
-      'a.settledAt',
-      'a.createdAt',
-      'b.username as "userName"',
-      'c.username as "acceptedUserName"',
-    ],
-    fieldEq: ['a.status', 'a.userId'],
     where: (ctx: any) => {
       const { startCreatedAt, endCreatedAt } = ctx?.request?.body || {};
       const wheres: [string, object][] = [];

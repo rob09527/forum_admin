@@ -7,7 +7,7 @@ import axios from 'axios';
  *
  * 配置契约（Redis key 名 + zod schema + 默认值）只在 forum server 存一份（服务端单一写入口），
  * 本服务不再直连共享 Redis、不再手抄 key 与校验，统一经 forum server 管理接口读写：
- *   GET    /api/admin/config           读取 6 组「已解析生效值」（zod 校验 + 默认兜底后）
+ *   GET    /api/admin/config           读取全部配置组的「已解析生效值」（zod 校验 + 默认兜底后）
  *   PUT    /api/admin/config/:group    写入一组（server 侧按 zod schema 校验，非法回 400）
  *   DELETE /api/admin/config/:group    删除 Redis key → forum 侧回退代码内置默认值
  * 服务间带 X-Admin-Key，错误 message 透传（同 service/bounty.ts 的退款转发模式）。
@@ -42,7 +42,7 @@ export class ForumGameConfigService {
     }
   }
 
-  /** 读取当前配置：forum 返回 6 组已解析生效值（checkin/levels/shop/tip/bounty/props），页面据此初始化 */
+  /** 读取当前配置：forum 返回全部组的已解析生效值（checkin/levels/shop/tip/bounty/props/limits），页面据此初始化 */
   async getConfig(): Promise<any> {
     return this.call('get', '/api/admin/config');
   }
@@ -70,6 +70,15 @@ export class ForumGameConfigService {
   /** 保存悬赏配置 */
   async saveBounty(cfg: any): Promise<void> {
     await this.call('put', '/api/admin/config/bounty', cfg);
+  }
+
+  /**
+   * 保存频率/体积限制配置（第 7 组 config:limits）。
+   * ⚠️ 非超管账号调用本方法需要权限点 `forum:config:saveLimits`，而它**还没进 menu.json**
+   * （本轮红线不许改 menu.json），未补前非超管会被 authority 中间件拦成 403。详见交接快照 §13.6。
+   */
+  async saveLimits(cfg: any): Promise<void> {
+    await this.call('put', '/api/admin/config/limits', cfg);
   }
 
   /** 保存功能道具配置 */

@@ -26,28 +26,18 @@ const LIST_COLUMNS = [
 
 /**
  * 论坛帖子管理。
- * 读走 Cool 框架自动生成的 page/list/info（join 用户表取作者名）；
+ * 读走 Cool 框架自动生成的 page/info（join 用户表取作者名）；
  * 置顶是简单写直连 PG，删除转发 forum server。
+ *
+ * 不开放 `list`：框架的 list() 不加任何 LIMIT，posts 是随业务线性增长的大表，
+ * 一次全量返回会打挂单进程的 Midway。前端 view 走 page + cl-pagination，不依赖 list。
  */
 @Provide()
 @CoolController({
-  api: ['page', 'list', 'info'],
+  api: ['page', 'info'],
   entity: ForumPostEntity,
   service: ForumPostService,
   pageQueryOp: {
-    select: LIST_COLUMNS,
-    keyWordLikeFields: ['a.title', 'b.username'],
-    fieldEq: ['category'],
-    join: [
-      {
-        entity: ForumUserEntity,
-        alias: 'b',
-        condition: 'a.authorId = b.id',
-      },
-    ],
-    addOrderBy: { createdAt: 'DESC' },
-  },
-  listQueryOp: {
     select: LIST_COLUMNS,
     keyWordLikeFields: ['a.title', 'b.username'],
     fieldEq: ['category'],

@@ -4,6 +4,8 @@
 			<!-- 刷新 -->
 			<cl-refresh-btn />
 			<cl-flex1 />
+			<!-- 来源筛选（真实注册 / 导入影子用户 / 全部） -->
+			<cl-search ref="Search" />
 			<!-- 关键字搜索（用户名/邮箱） -->
 			<cl-search-key :placeholder="$t('搜索用户名 / 邮箱')" />
 		</cl-row>
@@ -29,7 +31,7 @@ defineOptions({
 	name: 'forum-user-list'
 });
 
-import { useCrud, useTable, useUpsert } from '@cool-vue/crud';
+import { useCrud, useSearch, useTable, useUpsert } from '@cool-vue/crud';
 import { useCool } from '/@/cool';
 import { showError } from '/@/cool/utils';
 import { useI18n } from 'vue-i18n';
@@ -55,6 +57,12 @@ const options = reactive({
 		{ label: '正常', value: 'active', type: 'success' },
 		{ label: '封禁', value: 'banned', type: 'danger' },
 		{ label: '禁言', value: 'muted', type: 'warning' }
+	],
+	// 来源（users.isShadow）：导入的影子用户量级远大于真人，必须能筛掉才看得见真人
+	// 值用 'true'/'false' 字符串，后端只认这两种取值，其余（含清空）视为「全部」
+	source: [
+		{ label: '真实用户', value: 'false', type: 'success' },
+		{ label: '导入用户', value: 'true', type: 'info' }
 	]
 });
 
@@ -131,6 +139,13 @@ const Table = useTable({
 			minWidth: 90
 		},
 		{
+			label: t('来源'),
+			prop: 'isShadow',
+			width: 90,
+			// 后端返回的是真布尔，不能复用 options.source 的字符串 dict，直接格式化
+			formatter: row => (row.isShadow ? t('导入') : t('真实'))
+		},
+		{
 			label: t('注册时间'),
 			prop: 'createdAt',
 			sortable: 'desc',
@@ -161,6 +176,25 @@ const Table = useTable({
 			]
 		}
 	]
+});
+
+// cl-search（来源筛选）
+// 清空下拉时 next 显式传 undefined，避免空串被后端当有效取值
+const Search = useSearch({
+	items: [
+		{
+			label: t('来源'),
+			prop: 'isShadow',
+			component: {
+				name: 'cl-select',
+				props: { options: options.source, refreshOnChange: false },
+				style: { width: '150px' }
+			}
+		}
+	],
+	onSearch(data, { next }) {
+		next({ isShadow: data.isShadow || undefined });
+	}
 });
 
 // cl-crud
