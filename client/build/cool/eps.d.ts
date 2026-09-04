@@ -2891,6 +2891,50 @@ declare namespace Eps {
 		request: Request;
 	}
 
+	interface ForumNodeloc {
+		/**
+		 * 启停同步 worker 开关（热切换，body: { syncEnabled }）
+		 */
+		setSyncEnabled(data?: any): Promise<any>;
+
+		/**
+		 * 单主题重灌（body: { topicId }，幂等）
+		 */
+		reimportTopic(data?: any): Promise<any>;
+
+		/**
+		 * 读取导入概览（阶段/游标/映射量/影子规模）
+		 */
+		getOverview(data?: any): Promise<any>;
+
+		/**
+		 * 重建帖子搜索索引（回填完成后执行）
+		 */
+		reindex(data?: any): Promise<any>;
+
+		/**
+		 * 权限标识
+		 */
+		permission: {
+			setSyncEnabled: string;
+			reimportTopic: string;
+			getOverview: string;
+			reindex: string;
+		};
+
+		/**
+		 * 权限状态
+		 */
+		_permission: {
+			setSyncEnabled: boolean;
+			reimportTopic: boolean;
+			getOverview: boolean;
+			reindex: boolean;
+		};
+
+		request: Request;
+	}
+
 	interface ForumNotification {
 		/**
 		 * 群发系统通知
@@ -3583,6 +3627,7 @@ declare namespace Eps {
 			config: ForumConfig;
 			dashboard: ForumDashboard;
 			decoration: ForumDecoration;
+			nodeloc: ForumNodeloc;
 			notification: ForumNotification;
 			pointLog: ForumPointLog;
 			post: ForumPost;
