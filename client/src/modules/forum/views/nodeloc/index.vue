@@ -1,6 +1,10 @@
 <template>
 	<el-scrollbar>
-		<div class="nodeloc-page">
+		<div class="nodeloc-page" v-loading="loading">
+			<!-- 加载失败提示：forum 侧端点未部署 / 未重启时，明确报错而不是静默显示全 0 -->
+			<el-alert v-if="error" type="error" :title="'加载失败'" show-icon :closable="false" class="mb-3">
+				{{ error }}
+			</el-alert>
 			<!-- 顶部：worker 开关（热切换）+ 阶段徽章 -->
 			<el-card shadow="never" class="mb-3">
 				<div class="flex items-center justify-between flex-wrap gap-3">
@@ -9,6 +13,7 @@
 						<el-tag :type="phaseTagType" size="small">{{ phaseLabel }}</el-tag>
 						<el-tag v-if="overview?.syncEnabled" type="success" size="small" effect="plain">同步中</el-tag>
 						<el-tag v-else type="info" size="small" effect="plain">已暂停</el-tag>
+						<el-button size="small" text :loading="loading" @click="load">刷新</el-button>
 					</div>
 					<div class="flex items-center gap-2">
 						<span class="text-sm text-zinc-500">同步 worker 开关</span>
@@ -119,7 +124,7 @@ defineOptions({
 	name: 'forum-nodeloc-index'
 });
 
-import { computed, onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { useCool } from '/@/cool';
 import { showError } from '/@/cool/utils';
@@ -140,6 +145,8 @@ const reimportId = ref('');
 const reimporting = ref(false);
 const reindexing = ref(false);
 const reindexResult = ref<number | null>(null);
+const loading = ref(false);
+const error = ref('');
 
 const phaseLabel = computed(() => {
 	const phase = overview.value?.phase;
@@ -167,15 +174,7 @@ function fmt(n: number): string {
 	return (n ?? 0).toLocaleString('zh-CN');
 }
 
-onMounted(async () => {
-	try {
-		const data: any = await service.forum.nodeloc.getOverview();
-		overview.value = data;
-		syncEnabled.value = !!data?.syncEnabled;
-	} catch (err) {
-		console.error('[nodeloc] 加载概览失败:', err);
-	}
-});
+onMounted(load);
 
 async function toggleSync(val: boolean) {
 	savingToggle.value = true;
@@ -231,14 +230,19 @@ async function doReindex() {
 	}
 }
 
-/** 重新拉取概览（重灌后规模/游标可能变化） */
+/** 重新拉取概览（重灌后规模/游标可能变化；失败时回显错误，不再静默置零） */
 async function load() {
+	loading.value = true;
+	error.value = '';
 	try {
 		const data: any = await service.forum.nodeloc.getOverview();
 		overview.value = data;
 		syncEnabled.value = !!data?.syncEnabled;
-	} catch (err) {
-		console.error('[nodeloc] 刷新概览失败:', err);
+	} catch (err: any) {
+		console.error('[nodeloc] 加载概览失败:', err);
+		error.value = err?.message || '无法连接 forum 服务，请确认 forum server 已重启部署 nodeloc 管理端点';
+	} finally {
+		loading.value = false;
 	}
 }
 </script>
