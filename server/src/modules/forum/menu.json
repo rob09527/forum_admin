@@ -375,6 +375,67 @@
             "childMenus": []
           }
         ]
+      },
+      {
+        "name": "NodeLoc 管理",
+        "router": "/forum/nodeloc",
+        "perms": null,
+        "type": 1,
+        "icon": "icon-db",
+        "orderNum": 9,
+        "viewPath": "modules/forum/views/nodeloc/index.vue",
+        "keepAlive": true,
+        "isShow": true,
+        "childMenus": [
+          {
+            "name": "读取导入概览",
+            "router": null,
+            "perms": "forum:nodeloc:getOverview",
+            "type": 2,
+            "icon": null,
+            "orderNum": 1,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          },
+          {
+            "name": "启停同步 worker",
+            "router": null,
+            "perms": "forum:nodeloc:setSyncEnabled",
+            "type": 2,
+            "icon": null,
+            "orderNum": 2,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          },
+          {
+            "name": "单主题重灌",
+            "router": null,
+            "perms": "forum:nodeloc:reimportTopic",
+            "type": 2,
+            "icon": null,
+            "orderNum": 3,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          },
+          {
+            "name": "重建搜索索引",
+            "router": null,
+            "perms": "forum:nodeloc:reindex",
+            "type": 2,
+            "icon": null,
+            "orderNum": 4,
+            "viewPath": null,
+            "keepAlive": true,
+            "isShow": true,
+            "childMenus": []
+          }
+        ]
       }
     ]
   },
