@@ -15,6 +15,10 @@
  * 头像风格清单不在此手抄：权威列表由 forum server 的 /api/avatar-styles 下发
  * （service/shopItem.ts 运行时拉取后调 buildAvatarCatalog 生成 360 个头像目录）。
  *
+ * ⚠️ 头像商品化已于 §9.1/§9.2 下线：头像不再是付费商品（预置模板任选 + 自定义上传，均免费），
+ * 商城仅剩称号 / 用户名颜色两类。下方 AvatarDef / AVATAR_FREE_STYLES / buildAvatarCatalog 保留
+ * 仅为管理库里已软下架的 360 行 type='avatar' 商品行（软下架保留），不再产生新的可售头像商品。
+ *
  * 若新增称号：先出图落 client/public/images/title-icons/ 与 admin/client/public/images/title-icons/，
  * 再往 TITLE_CATALOG 追加一行（key 必须与文件名主干一致），seed 会自动补齐。
  */
